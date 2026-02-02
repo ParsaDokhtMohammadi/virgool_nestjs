@@ -10,6 +10,8 @@ export class UserEntity extends BaseEntity {
     mobile:string
     @Column({unique:true})
     email:string
+    @Column()
+    password:string
     @CreateDateColumn()
     created_at:Date
     @UpdateDateColumn()
