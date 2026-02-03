@@ -1,5 +1,5 @@
 import { EntityNames } from 'src/common/enums/entity.enum';
-import { BaseEntity } from './../../common/abstracts/base.entity';
+import { BaseEntity } from './../../../common/abstracts/base.entity';
 import { Column, Entity } from "typeorm";
 
 @Entity(EntityNames.PROFILE)

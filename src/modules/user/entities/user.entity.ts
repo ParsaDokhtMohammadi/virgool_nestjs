@@ -1,4 +1,4 @@
-import { BaseEntity } from './../../common/abstracts/base.entity';
+import { BaseEntity } from './../../../common/abstracts/base.entity';
 import { EntityNames } from "src/common/enums/entity.enum";
 import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
 
