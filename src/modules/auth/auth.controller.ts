@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthDto } from './dto/auth.dto';
-import { urlEncoded } from 'src/common/constants/urlencoded.const';
+import { urlEncoded } from 'src/common/constants/constants';
 
 @Controller('auth')
 @ApiTags("auth")
