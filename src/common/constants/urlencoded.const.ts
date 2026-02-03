@@ -1,0 +1,1 @@
+export const urlEncoded = "application/x-www-form-urlencoded"
