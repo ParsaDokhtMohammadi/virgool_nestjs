@@ -10,5 +10,6 @@ import { OtpEntity } from './entities/otp.entity';
   imports : [TypeOrmModule.forFeature([UserEntity,ProfileEntity,OtpEntity])],
   controllers: [UserController],
   providers: [UserService],
+  exports:[UserService,TypeOrmModule]
 })
 export class UserModule {}
