@@ -8,12 +8,15 @@ import { UserEntity } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ProfileEntity } from '../user/entities/profile.entity';
 import { LOGINMESSAGE } from 'src/common/enums/message.enum';
+import { OtpEntity } from '../user/entities/otp.entity';
+import { randomInt } from 'crypto';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(UserEntity) private UserRepo: Repository<UserEntity>,
-        @InjectRepository(ProfileEntity) private ProfileRepo: Repository<ProfileEntity>
+        @InjectRepository(ProfileEntity) private ProfileRepo: Repository<ProfileEntity>,
+        @InjectRepository(OtpEntity) private OtpRepo: Repository<OtpEntity>
     ) { }
     userExistance(authDto: AuthDto) {
         const { method, type, username } = authDto
@@ -29,11 +32,13 @@ export class AuthService {
     async login(method: AuthMethod, username: string) {
         const validUsername = this.usernameValidator(method, username)
         const user = await this.CheckUserExistance(method,validUsername)
-
+        
+        
         
     }
     register(method: AuthMethod, username: string) {
-
+        if(!isEmail(username)) throw new BadRequestException("email is not correct")
+        
     }
     usernameValidator(method: AuthMethod, username: string) {
         switch (method) {
@@ -60,8 +65,23 @@ export class AuthService {
         }
         else throw new BadRequestException(LOGINMESSAGE.INVALID_LOGIN_DATA)
     }
-    async sendOtp(){
-        
+    async saveOtp(user_id:number){
+        const code = randomInt(10000,99999)
+        const expires_in = new Date(Date.now()+1000*60*2)
+        let otp = await this.OtpRepo.findOneBy({user_id})
+        if(otp){
+            otp.code = code
+            otp.expires_in =expires_in
+        }
+        else {
+             otp = this.OtpRepo.create({
+                code,
+                expires_in,
+                user_id
+            })
+        }
+        await this.OtpRepo.save(otp)
+        return otp.id
     }
     async checkOtp(){
 
