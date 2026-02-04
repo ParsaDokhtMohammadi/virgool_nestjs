@@ -5,17 +5,17 @@ import { OtpEntity } from './otp.entity';
 
 @Entity(EntityNames.USER)
 export class UserEntity extends BaseEntity {
-    @Column({unique:true})
+    @Column({unique:true , nullable:true})
     username:string
     @Column({unique:true , nullable:true})
     mobile:string
     @Column({unique:true})
     email:string
-    @Column()
+    @Column({nullable:true})
     password:string
-    @CreateDateColumn()
+    @CreateDateColumn({default:new Date()})
     created_at:Date
-    @UpdateDateColumn()
+    @UpdateDateColumn({default:new Date()})
     updated_at:Date
     @OneToOne(()=>OtpEntity,otp => otp.user,{onDelete:"CASCADE"})
     otp:OtpEntity

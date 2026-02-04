@@ -8,6 +8,9 @@ export enum LOGINMESSAGE {
     EMAIL_NOT_FOUND = "user with this email does not exist"
 }
 export enum REGISTERMESSAGE {
-    INVALID_REGISTER_DATA = "invalid register data"
+    INVALID_REGISTER_DATA = "invalid register data",
+    INVAID_EMAIL_FORMAT = "invalid email format",
+    CONFLICT = "user with this email already exists",
+    OTPSENT = "otp code sent to "
 }
 
