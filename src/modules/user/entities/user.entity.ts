@@ -1,6 +1,7 @@
 import { BaseEntity } from './../../../common/abstracts/base.entity';
 import { EntityNames } from "src/common/enums/entity.enum";
-import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToOne, UpdateDateColumn } from "typeorm";
+import { OtpEntity } from './otp.entity';
 
 @Entity(EntityNames.USER)
 export class UserEntity extends BaseEntity {
@@ -16,4 +17,6 @@ export class UserEntity extends BaseEntity {
     created_at:Date
     @UpdateDateColumn()
     updated_at:Date
+    @OneToOne(()=>OtpEntity,otp => otp.user,{onDelete:"CASCADE"})
+    otp:OtpEntity
 }
