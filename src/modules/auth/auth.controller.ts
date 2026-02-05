@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthDto, CheckOtpDto } from './dto/auth.dto';
 import { Json, urlEncoded } from 'src/common/constants/constants';
 import type { Request, Response } from 'express';
+import { AuthGuard } from './guards/auth.guard';
 
 
 @Controller('auth')
@@ -23,7 +24,8 @@ export class AuthController {
     
   }
   @Get('check-login')
-  @ApiConsumes(urlEncoded , Json)
+  @ApiBearerAuth("Authorization")
+  @UseGuards(AuthGuard)
   checkLogin(@Req() req:Request){
     return req.user
   }
