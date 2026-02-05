@@ -10,6 +10,7 @@ import { ProfileEntity } from '../user/entities/profile.entity';
 import { LOGINMESSAGE, REGISTERMESSAGE } from 'src/common/enums/message.enum';
 import { OtpEntity } from '../user/entities/otp.entity';
 import { randomInt } from 'crypto';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class AuthService {
@@ -34,16 +35,16 @@ export class AuthService {
         const user = await this.CheckUserExistance(method,username)
         
         
-        
-        
     }
     async register(method: AuthMethod, email: string) {
             if(method!==AuthMethod.EMAIL) throw new BadRequestException(REGISTERMESSAGE.INVALID_REGISTER_DATA)
             if(!isEmail(email)) throw new BadRequestException(REGISTERMESSAGE.INVAID_EMAIL_FORMAT)
             let user = await this.UserRepo.findOneBy({email})
             if(user) throw new ConflictException(REGISTERMESSAGE.CONFLICT)
+            
             user = this.UserRepo.create({
-                email
+                email,
+                username:nanoid(10)
             })
             user = await this.UserRepo.save(user)
             const otp = await this.saveOtp(user.id)
@@ -56,7 +57,7 @@ export class AuthService {
         switch (method) {
             case AuthMethod.EMAIL:
                 if (isEmail(username)) return username
-                throw new BadRequestException("email is not correct")
+                throw new BadRequestException(REGISTERMESSAGE.INVAID_EMAIL_FORMAT)
             case AuthMethod.USERNAME:
                 return username
             default:
