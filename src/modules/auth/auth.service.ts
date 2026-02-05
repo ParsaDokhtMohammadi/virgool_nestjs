@@ -123,7 +123,8 @@ export class AuthService {
         if(otp.code!=code) throw new UnauthorizedException(AuthMessage.INVALID_OTP)
         const now = new Date()
         if(otp.expires_in<now) throw new UnauthorizedException(AuthMessage.OTP_EXPIRED)
-        return true
+        const accessToken = this.tokenService.createAccessToken({user_id:otp.user_id})
+        return accessToken
     }
     async sendResponse(res: Response, result: AuthResponse) {
         res.cookie(COOKIE_KEYS.OTP, result.token, {
