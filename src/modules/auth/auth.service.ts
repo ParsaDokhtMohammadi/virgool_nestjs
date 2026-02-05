@@ -11,13 +11,15 @@ import { LOGINMESSAGE, REGISTERMESSAGE } from 'src/common/enums/message.enum';
 import { OtpEntity } from '../user/entities/otp.entity';
 import { randomInt } from 'crypto';
 import { nanoid } from 'nanoid';
+import { TokenService } from './Token.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(UserEntity) private UserRepo: Repository<UserEntity>,
         @InjectRepository(ProfileEntity) private ProfileRepo: Repository<ProfileEntity>,
-        @InjectRepository(OtpEntity) private OtpRepo: Repository<OtpEntity>
+        @InjectRepository(OtpEntity) private OtpRepo: Repository<OtpEntity>,
+        private tokenService : TokenService
     ) { }
     userExistance(authDto: AuthDto) {
         const { method, type, username } = authDto
