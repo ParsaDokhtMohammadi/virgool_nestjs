@@ -6,7 +6,7 @@ export const SwaggerConfigInit=(app:INestApplication):void => {
     .setTitle("Virgool clone")
     .setDescription("backend endpoints of virgool clone")
     .setVersion("v1.0.0")
-    .addBearerAuth(swaggerAuthConfig(),"authorization")
+    .addBearerAuth(swaggerAuthConfig(),"Authorization")
     .build()
     const swaggerDocument = SwaggerModule.createDocument(app,document)
     SwaggerModule.setup("/swagger",app,swaggerDocument)

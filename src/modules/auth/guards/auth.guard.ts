@@ -14,6 +14,7 @@ export class AuthGuard implements CanActivate {
         request.user = await this.authService.validateAccessToken(token)
         return true
     }
+
     protected extractToken(request:Request){
          const {authorization} = request.headers
         if(!authorization || authorization?.trim()=="") throw new UnauthorizedException(AuthMessage.LOGIN_REQUIRED)
