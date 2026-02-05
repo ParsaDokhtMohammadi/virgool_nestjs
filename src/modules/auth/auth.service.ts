@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { AuthTypes } from 'src/common/enums/type.enum';
 import { AuthMethod } from 'src/common/enums/method.enum';
@@ -7,22 +7,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ProfileEntity } from '../user/entities/profile.entity';
-import { LOGINMESSAGE, REGISTERMESSAGE } from 'src/common/enums/message.enum';
+import { AuthMessage, LOGINMESSAGE, REGISTERMESSAGE } from 'src/common/enums/message.enum';
 import { OtpEntity } from '../user/entities/otp.entity';
 import { randomInt } from 'crypto';
 import { nanoid } from 'nanoid';
 import { TokenService } from './Token.service';
-import { Response } from 'express';
+import type{ Request, Response } from 'express';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 import { AuthResponse } from './types/response';
+import { REQUEST } from '@nestjs/core';
 
-@Injectable()
+@Injectable({scope:Scope.REQUEST})
 export class AuthService {
     constructor(
         @InjectRepository(UserEntity) private UserRepo: Repository<UserEntity>,
         @InjectRepository(ProfileEntity) private ProfileRepo: Repository<ProfileEntity>,
         @InjectRepository(OtpEntity) private OtpRepo: Repository<OtpEntity>,
-        private tokenService: TokenService
+        private tokenService: TokenService,
+        @Inject(REQUEST) private request:Request
     ) { }
     async userExistance(authDto: AuthDto, res: Response) {
         const { method, type, username } = authDto
@@ -112,8 +114,10 @@ export class AuthService {
         await this.OtpRepo.save(otp)
         return otp
     }
-    async checkOtp() {
-
+    async checkOtp(code:string|number){
+        const token = this.request.cookies?.[COOKIE_KEYS.OTP]
+        if(!token) throw new UnauthorizedException(AuthMessage.EXPIRED_CODE)
+        return token
     }
     async sendResponse(res: Response, result: AuthResponse) {
         res.cookie(COOKIE_KEYS.OTP, result.token, {

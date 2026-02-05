@@ -1,5 +1,5 @@
 export enum AuthMessage {
-
+ EXPIRED_CODE = "otp code expired"
 }
 
 export enum LOGINMESSAGE {
