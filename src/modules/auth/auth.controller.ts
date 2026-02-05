@@ -13,11 +13,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('user-existance')
   @ApiConsumes(urlEncoded , Json)
-  userExistance(@Body() authDto:AuthDto,@Res() res:Response){
-    const result = this.authService.userExistance(authDto)
-    res.cookie(COOKIE_KEYS.OTP,{
-      
-    })
+   userExistance(@Body() authDto:AuthDto,@Res() res:Response){
+    return this.authService.userExistance(authDto , res)
+
   }
 
 }
