@@ -9,5 +9,6 @@ namespace NodeJS {
         DB_PASSWORD:string
         DB_HOST:string
         //secrets
+        COOKIE_SECRET:string
     }
 }

@@ -1,8 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthDto } from './dto/auth.dto';
 import { Json, urlEncoded } from 'src/common/constants/constants';
+import type { Response } from 'express';
+import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
+
 
 @Controller('auth')
 @ApiTags("auth")
@@ -10,8 +13,11 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('user-existance')
   @ApiConsumes(urlEncoded , Json)
-  userExistance(@Body() authDto:AuthDto){
-    return this.authService.userExistance(authDto)
+  userExistance(@Body() authDto:AuthDto,@Res() res:Response){
+    const result = this.authService.userExistance(authDto)
+    res.cookie(COOKIE_KEYS.OTP,{
+      
+    })
   }
 
 }

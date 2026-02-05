@@ -32,7 +32,14 @@ export class AuthService {
     }
     async login(method: AuthMethod, username: string) {
         const validUsername = this.usernameValidator(method, username)
-        const user = await this.CheckUserExistance(method,username)
+        const user = await this.CheckUserExistance(method,validUsername)
+        if(!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
+        const otp = await this.sendOtp(user.id)
+        return {
+            message:"otp sent",
+            user_id:user.id,
+            code:otp.code
+        }
         
         
     }
@@ -47,9 +54,10 @@ export class AuthService {
                 username:nanoid(10)
             })
             user = await this.UserRepo.save(user)
-            const otp = await this.saveOtp(user.id)
+            const otp = await this.sendOtp(user.id)
             return {
                 message:REGISTERMESSAGE.OTPSENT+email,
+                user_id : user.id,
                 code:otp.code
             }
     }
@@ -78,7 +86,7 @@ export class AuthService {
         }
         else throw new BadRequestException(LOGINMESSAGE.INVALID_LOGIN_DATA)
     }
-    async saveOtp(user_id:number){
+    async sendOtp(user_id:number){
         const code = randomInt(10000,99999)
         const expires_in = new Date(Date.now()+1000*60*2)
         let otp = await this.OtpRepo.findOneBy({user_id})
