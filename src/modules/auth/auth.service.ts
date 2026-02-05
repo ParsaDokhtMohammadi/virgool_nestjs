@@ -136,4 +136,11 @@ export class AuthService {
             code: result.code
         })
     }
+    async validateAccessToken(token:string){
+        const {user_id} = this.tokenService.verifyAccessToken(token)
+        const user = await this.UserRepo.findOneBy({id:user_id})
+        if(!user) throw new UnauthorizedException(LOGINMESSAGE.LOGIN_AGAIN)
+        return user
+    }
+
 }
