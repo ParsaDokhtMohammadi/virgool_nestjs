@@ -29,8 +29,8 @@ export class AuthController {
         // OTP token: short expiry
         res.cookie(COOKIE_KEYS.OTP, result.token, { ...cookieOptions, maxAge: 1000 * 60 * 2 });
       } else if (authDto.type === AuthTypes.LOGIN) {
-        // Access token: longer expiry (e.g., 1 day)
-        res.cookie(COOKIE_KEYS.ACCESS, result.token, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 });
+        // Access token: longer expiry (e.g., 1 year)
+        res.cookie(COOKIE_KEYS.ACCESS, result.token, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 365 });
       }
     }
 
@@ -40,7 +40,8 @@ export class AuthController {
   @Post('check-otp')
   @ApiConsumes(urlEncoded , Json)
   checkOtp(@Body() OtpDto:CheckOtpDto){
-    return this.authService.checkOtp(OtpDto.code)
+    //type will be set automatically in the frontend
+    return this.authService.checkOtp(OtpDto.code,OtpDto.type)
     
   }
   @Get('check-login')

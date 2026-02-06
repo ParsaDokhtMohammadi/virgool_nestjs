@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { AuthTypes } from 'src/common/enums/type.enum';
 import { AuthMethod } from 'src/common/enums/method.enum';
@@ -17,6 +17,7 @@ import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 import { REQUEST } from '@nestjs/core';
 import {hashSync,genSaltSync, compareSync} from "bcrypt"
 import { MailService } from './mail.service';
+import { OTP_TYPE_ENUM } from 'src/common/enums/checkOtpType.enum';
 
 @Injectable({scope:Scope.REQUEST})
 export class AuthService {
@@ -123,7 +124,7 @@ export class AuthService {
             code:otp.code
         }
     }
-    async checkOtp(code:string|number ){
+    async checkOtp(code:string|number ,type:OTP_TYPE_ENUM){
         const token = this.request.cookies?.[COOKIE_KEYS.OTP]
         if(!token) throw new UnauthorizedException(AuthMessage.EXPIRED_CODE)
         const payload = this.tokenService.verifyOtpToken(token)
@@ -132,12 +133,16 @@ export class AuthService {
         if(otp.code!=code) throw new UnauthorizedException(AuthMessage.INVALID_OTP)
         const now = new Date()
         if(otp.expires_in<now) throw new UnauthorizedException(AuthMessage.OTP_EXPIRED)
-        const verify = await this.verifyUser(otp.user_id)
-        return {
-            message:"account verified"
+        if(type===OTP_TYPE_ENUM.VERIFY_USER){
+            const verify = await this.verifyUser(otp.user_id)
+            if(!verify) throw new UnauthorizedException(AuthMessage.UNEXPECTED_ERR)
+            return {
+                message:"account verified"
+            }
         }
+        return "check complete"
     }
-
+    //is being used in Auth Guard do not delete
     async validateAccessToken(token:string){
         const {user_id} = this.tokenService.verifyAccessToken(token)
         const user = await this.UserRepo.findOneBy({id:user_id})

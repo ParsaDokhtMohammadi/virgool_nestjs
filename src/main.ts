@@ -9,7 +9,7 @@ async function bootstrap() {
   app.use(cookieParser(process.env.COOKIE_SECRET||"secret"))
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(process.env.PORT ?? 3000,()=>{
-    console.log("server running")
+    console.log("http://localhost:3000 \nhttp://localhost:3000/swagger")
   });
 }
 bootstrap();
