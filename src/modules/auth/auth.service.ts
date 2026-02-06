@@ -16,6 +16,7 @@ import type{ Request } from 'express';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 import { REQUEST } from '@nestjs/core';
 import {hashSync,genSaltSync, compareSync} from "bcrypt"
+import { MailService } from './mail.service';
 
 @Injectable({scope:Scope.REQUEST})
 export class AuthService {
@@ -24,6 +25,7 @@ export class AuthService {
         @InjectRepository(ProfileEntity) private ProfileRepo: Repository<ProfileEntity>,
         @InjectRepository(OtpEntity) private OtpRepo: Repository<OtpEntity>,
         private tokenService: TokenService,
+        private mailService: MailService,
         @Inject(REQUEST) private request:Request
     ) { }
     async userExistance(authDto: AuthDto) {
@@ -67,8 +69,10 @@ export class AuthService {
         })
         user = await this.UserRepo.save(user)
         const otp = await this.sendOtp(user.id)
+        await this.mailService.sendMail(email,"register verification code",`your code is: ${otp.code}`)
         return {
-            code: otp.code,
+            message:REGISTERMESSAGE.VERIFICATION_CODE_SENT,
+            // code: otp.code,
             token:otp.token
         }
     }

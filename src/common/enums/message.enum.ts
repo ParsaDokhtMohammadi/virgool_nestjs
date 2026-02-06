@@ -20,6 +20,7 @@ export enum REGISTERMESSAGE {
     CONFLICT = "user with this email already exists",
     OTPSENT = "otp code sent to ",
     PASSWORD_MISMATCH = "password and confirm password do not match",
-    USER_VERIFIED = "user already verified"
+    USER_VERIFIED = "user already verified",
+    VERIFICATION_CODE_SENT = "a verification code was sent to your account"
 }
 
