@@ -17,6 +17,7 @@ export enum REGISTERMESSAGE {
     INVALID_REGISTER_DATA = "invalid register data",
     INVAID_EMAIL_FORMAT = "invalid email format",
     CONFLICT = "user with this email already exists",
-    OTPSENT = "otp code sent to "
+    OTPSENT = "otp code sent to ",
+    PASSWORD_MISMATCH = "password and confirm password do not match"
 }
 

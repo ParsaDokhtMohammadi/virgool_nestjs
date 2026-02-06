@@ -14,15 +14,15 @@ export class AuthDto {
     @ApiProperty({ enum: AuthMethod })
     @IsEnum(AuthMethod)
     method: AuthMethod
-    @ApiProperty()
+    @ApiProperty({required:false})
     @IsString()
-    @IsOptional()
     @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/, {
         message:
-            'Password must be at least 8 characters long and include uppercase, lowercase letters and a number',
+        'Password must be at least 8 characters long and include uppercase, lowercase letters and a number',
     })
+    @IsOptional()
     password: string;
-    @ApiProperty()
+    @ApiProperty({required:false})
     @IsOptional()
     @IsString()
     confirm_password: string;

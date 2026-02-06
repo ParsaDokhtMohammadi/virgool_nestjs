@@ -27,14 +27,14 @@ export class AuthService {
         @Inject(REQUEST) private request:Request
     ) { }
     async userExistance(authDto: AuthDto, res: Response) {
-        const { method, type, username } = authDto
+        const { method, type, username ,password , confirm_password} = authDto
         let result:AuthResponse
         switch (type) {
             case AuthTypes.LOGIN:
                 result = await this.login(method, username)
                 return this.sendResponse(res, result)
             case AuthTypes.REGISTER:
-                result = await this.register(method, username)
+                result = await this.register(method,username,password,confirm_password)
                 return this.sendResponse(res, result)
             default:
                 throw new UnauthorizedException()
@@ -53,16 +53,18 @@ export class AuthService {
 
 
     }
-    async register(method: AuthMethod, email: string) {
+    async register(method: AuthMethod, email: string, password:string , confirm_password:string) {
         if (method !== AuthMethod.EMAIL) throw new BadRequestException(REGISTERMESSAGE.INVALID_REGISTER_DATA)
         if (!isEmail(email)) throw new BadRequestException(REGISTERMESSAGE.INVAID_EMAIL_FORMAT)
+        if(!password || !confirm_password) throw new UnauthorizedException(REGISTERMESSAGE.INVALID_REGISTER_DATA)
+        if(password!==confirm_password) throw new UnauthorizedException(REGISTERMESSAGE.PASSWORD_MISMATCH)
         let user = await this.UserRepo.findOneBy({ email })
         if (user) throw new ConflictException(REGISTERMESSAGE.CONFLICT)
         
-
         user = this.UserRepo.create({
             email,
-            username: nanoid(10)
+            username: nanoid(10),
+            password
         })
         user = await this.UserRepo.save(user)
         const token = this.tokenService.generateOtpToken({ user_id: user.id })
