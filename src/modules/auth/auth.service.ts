@@ -123,22 +123,16 @@ export class AuthService {
             code:otp.code
         }
     }
-    async checkOtp(code:string|number){
+    async checkOtp(code:string|number ){
         const token = this.request.cookies?.[COOKIE_KEYS.OTP]
         if(!token) throw new UnauthorizedException(AuthMessage.EXPIRED_CODE)
         const payload = this.tokenService.verifyOtpToken(token)
         const otp = await this.OtpRepo.findOneBy({user_id:payload.user_id})
-        console.log(otp);
-        
         if(!otp) throw new UnauthorizedException(AuthMessage.TRY_AGAIN)
         if(otp.code!=code) throw new UnauthorizedException(AuthMessage.INVALID_OTP)
         const now = new Date()
         if(otp.expires_in<now) throw new UnauthorizedException(AuthMessage.OTP_EXPIRED)
-        const user = await this.UserRepo.findOneBy({id:otp.user_id})
-        if(!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
-        if(user.verified) throw new BadRequestException(REGISTERMESSAGE.USER_VERIFIED)
-        user.verified = true
-        await this.UserRepo.save(user)
+        const verify = await this.verifyUser(otp.user_id)
         return {
             message:"account verified"
         }
@@ -157,5 +151,13 @@ export class AuthService {
     }
     comparePassword(password:string ,hashedPassword:string){
         return compareSync(password,hashedPassword)
+    }
+    async verifyUser(user_id:number){
+        const user = await this.UserRepo.findOneBy({id:user_id})
+        if(!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
+        if(user.verified) throw new BadRequestException(REGISTERMESSAGE.USER_VERIFIED)
+        user.verified = true
+        await this.UserRepo.save(user)
+        return true
     }
 }
