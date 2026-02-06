@@ -58,6 +58,7 @@ export class AuthService {
         if (!isEmail(email)) throw new BadRequestException(REGISTERMESSAGE.INVAID_EMAIL_FORMAT)
         let user = await this.UserRepo.findOneBy({ email })
         if (user) throw new ConflictException(REGISTERMESSAGE.CONFLICT)
+        
 
         user = this.UserRepo.create({
             email,
