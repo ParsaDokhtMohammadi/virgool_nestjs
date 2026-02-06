@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { AuthTypes } from 'src/common/enums/type.enum';
 import { AuthMethod } from 'src/common/enums/method.enum';
@@ -16,6 +16,7 @@ import type{ Request, Response } from 'express';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 import { AuthResponse } from './types/response';
 import { REQUEST } from '@nestjs/core';
+import {hashSync,genSaltSync} from "bcrypt"
 
 @Injectable({scope:Scope.REQUEST})
 export class AuthService {
@@ -60,18 +61,17 @@ export class AuthService {
         if(password!==confirm_password) throw new UnauthorizedException(REGISTERMESSAGE.PASSWORD_MISMATCH)
         let user = await this.UserRepo.findOneBy({ email })
         if (user) throw new ConflictException(REGISTERMESSAGE.CONFLICT)
-        
+        const hashedPassword = this.hashPassword(password)
         user = this.UserRepo.create({
             email,
             username: nanoid(10),
-            password
+            password:hashedPassword
         })
         user = await this.UserRepo.save(user)
-        const token = this.tokenService.generateOtpToken({ user_id: user.id })
         const otp = await this.sendOtp(user.id)
         return {
-            token,
-            code: otp.code
+            code: otp.code,
+            token:otp.token
         }
     }
     usernameValidator(method: AuthMethod, username: string) {
@@ -114,8 +114,12 @@ export class AuthService {
                 user_id
             })
         }
+        const token = this.tokenService.generateOtpToken({ user_id })
         await this.OtpRepo.save(otp)
-        return otp
+        return {
+            token,
+            code:otp.code
+        }
     }
     async checkOtp(code:string|number){
         const token = this.request.cookies?.[COOKIE_KEYS.OTP]
@@ -126,8 +130,13 @@ export class AuthService {
         if(otp.code!=code) throw new UnauthorizedException(AuthMessage.INVALID_OTP)
         const now = new Date()
         if(otp.expires_in<now) throw new UnauthorizedException(AuthMessage.OTP_EXPIRED)
-        const accessToken = this.tokenService.createAccessToken({user_id:otp.user_id})
-        return accessToken
+        const user = await this.UserRepo.findOneBy({id:otp.user_id})
+        if(!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
+        user.verified = true
+        await this.UserRepo.save(user)
+        return {
+            message:"account verified"
+        }
     }
     async sendResponse(res: Response, result: AuthResponse) {
         res.cookie(COOKIE_KEYS.OTP, result.token, {
@@ -145,5 +154,12 @@ export class AuthService {
         if(!user) throw new UnauthorizedException(LOGINMESSAGE.LOGIN_AGAIN)
         return user
     }
+    hashPassword(password:string){
+        const salt = genSaltSync(10)
+        const hash = hashSync(password,salt)
+        return hash
+    }
+    comparePassword(password:string ,hashedPassword:string){
 
+    }
 }
