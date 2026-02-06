@@ -16,6 +16,7 @@ export class TokenService {
         return token
     }
     verifyOtpToken(token:string):CookiePayload {
+
         try{
             return this.jwtService.verify(token,{
                 secret:process.env.OTP_TOKEN_SECRET

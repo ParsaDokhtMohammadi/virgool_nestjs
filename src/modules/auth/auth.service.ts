@@ -12,11 +12,10 @@ import { OtpEntity } from '../user/entities/otp.entity';
 import { randomInt } from 'crypto';
 import { nanoid } from 'nanoid';
 import { TokenService } from './Token.service';
-import type{ Request, Response } from 'express';
+import type{ Request } from 'express';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
-import { AuthResponse } from './types/response';
 import { REQUEST } from '@nestjs/core';
-import {hashSync,genSaltSync} from "bcrypt"
+import {hashSync,genSaltSync, compareSync} from "bcrypt"
 
 @Injectable({scope:Scope.REQUEST})
 export class AuthService {
@@ -27,29 +26,28 @@ export class AuthService {
         private tokenService: TokenService,
         @Inject(REQUEST) private request:Request
     ) { }
-    async userExistance(authDto: AuthDto, res: Response) {
+    async userExistance(authDto: AuthDto) {
         const { method, type, username ,password , confirm_password} = authDto
-        let result:AuthResponse
         switch (type) {
             case AuthTypes.LOGIN:
-                result = await this.login(method, username)
-                return this.sendResponse(res, result)
+                return await this.login(method, username , password)
+
             case AuthTypes.REGISTER:
-                result = await this.register(method,username,password,confirm_password)
-                return this.sendResponse(res, result)
+              return await this.register(method,username,password,confirm_password)
             default:
                 throw new UnauthorizedException()
         }
     }
-    async login(method: AuthMethod, username: string) {
+    async login(method: AuthMethod, username: string , password:string) {
         const validUsername = this.usernameValidator(method, username)
         const user = await this.CheckUserExistance(method, validUsername)
         if (!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
-        const otp = await this.sendOtp(user.id)
-        const token = this.tokenService.generateOtpToken({ user_id: user.id })
+        const passCheck = this.comparePassword(password,user.password)
+        if(!passCheck) throw new UnauthorizedException(LOGINMESSAGE.INCORRECT_PASSWORD)
+        const token =  this.tokenService.createAccessToken({user_id:user.id})
         return {
-            token,
-            code: otp.code
+            message : "login successful",
+            token
         }
 
 
@@ -126,28 +124,22 @@ export class AuthService {
         if(!token) throw new UnauthorizedException(AuthMessage.EXPIRED_CODE)
         const payload = this.tokenService.verifyOtpToken(token)
         const otp = await this.OtpRepo.findOneBy({user_id:payload.user_id})
+        console.log(otp);
+        
         if(!otp) throw new UnauthorizedException(AuthMessage.TRY_AGAIN)
         if(otp.code!=code) throw new UnauthorizedException(AuthMessage.INVALID_OTP)
         const now = new Date()
         if(otp.expires_in<now) throw new UnauthorizedException(AuthMessage.OTP_EXPIRED)
         const user = await this.UserRepo.findOneBy({id:otp.user_id})
         if(!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
+        if(user.verified) throw new BadRequestException(REGISTERMESSAGE.USER_VERIFIED)
         user.verified = true
         await this.UserRepo.save(user)
         return {
             message:"account verified"
         }
     }
-    async sendResponse(res: Response, result: AuthResponse) {
-        res.cookie(COOKIE_KEYS.OTP, result.token, {
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24
-        })
-        res.json({
-            message: "otp sent",
-            code: result.code
-        })
-    }
+
     async validateAccessToken(token:string){
         const {user_id} = this.tokenService.verifyAccessToken(token)
         const user = await this.UserRepo.findOneBy({id:user_id})
@@ -160,6 +152,6 @@ export class AuthService {
         return hash
     }
     comparePassword(password:string ,hashedPassword:string){
-
+        return compareSync(password,hashedPassword)
     }
 }

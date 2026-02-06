@@ -5,14 +5,14 @@ import { OtpEntity } from './otp.entity';
 
 @Entity(EntityNames.USER)
 export class UserEntity extends BaseEntity {
-    @Column({unique:true , nullable:true})
+    @Column({unique:true})
     username?:string
     @Column({unique:true , nullable:true})
     mobile?:string
     @Column({unique:true})
     email!:string
-    @Column({nullable:true})
-    password?:string
+    @Column()
+    password:string
     @Column({default:false})
     verified!:boolean
     @CreateDateColumn({default:new Date()})
