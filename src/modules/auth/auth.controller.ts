@@ -36,9 +36,16 @@ export class AuthController {
   }
   @Post('check-otp')
   @ApiConsumes(urlEncoded , Json)
-  checkOtp(@Body() OtpDto:CheckOtpDto){
-    //type will be set automatically in the frontend
-    return this.authService.checkOtp(OtpDto.code,OtpDto.type)
+  async checkOtp(@Body() OtpDto:CheckOtpDto , @Res({ passthrough: true }) res: Response){
+
+     const result = await this.authService.checkOtp(OtpDto.code)
+     if(result.token){
+      res.cookie(COOKIE_KEYS.FORGOT_PASS,result.token,{httpOnly:true , maxAge:1000*60*10})
+      res.clearCookie(COOKIE_KEYS.OTP)
+     }else{
+      res.clearCookie(COOKIE_KEYS.OTP)
+     }
+     return result
     
   }
   @Get('check-login')
@@ -50,9 +57,9 @@ export class AuthController {
   @Post('forgot-password')
   @ApiConsumes(urlEncoded,Json)
   async forgotPassword(@Body() email:ForgotPasswordDto , @Res({ passthrough: true }) res: Response){
-    const result =await this.authService.forgotPassword(email)
-    res.cookie(COOKIE_KEYS.FORGOT_PASS,result.token,{httpOnly:true,maxAge:1000*60*2})
-    return result.message
+    const result = await this.authService.forgotPassword(email)
+    res.cookie(COOKIE_KEYS.OTP,result.token,{httpOnly:true,maxAge:1000*60*2})
+    return result.code
   }
 
 }

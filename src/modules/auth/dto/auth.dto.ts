@@ -34,9 +34,6 @@ export class CheckOtpDto {
     @IsString()
     @Length(5, 5)
     code: string
-    @ApiProperty({enum:OTP_TYPE_ENUM})
-    @IsEnum(OTP_TYPE_ENUM)
-    type:OTP_TYPE_ENUM
 }
 
 export class ForgotPasswordDto {

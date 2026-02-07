@@ -18,6 +18,7 @@ import { REQUEST } from '@nestjs/core';
 import {hashSync,genSaltSync, compareSync} from "bcrypt"
 import { MailService } from './mail.service';
 import { OTP_TYPE_ENUM } from 'src/common/enums/checkOtpType.enum';
+import { CookiePayload } from './types/payload';
 
 @Injectable({scope:Scope.REQUEST})
 export class AuthService {
@@ -115,8 +116,7 @@ export class AuthService {
     async sendOtp(user_id: number , tokenType:TOKEN_TYPE) {
         if (!Object.values(TOKEN_TYPE).includes(tokenType)) throw new BadRequestException("invalid request type")
         const code = randomInt(10000, 99999)
-        const time = tokenType===TOKEN_TYPE.VERIFY ? 2 : 10
-        const expires_in = new Date(Date.now() + 1000 * 60 * time)
+        const expires_in = new Date(Date.now() + 1000 * 60 * 2)
         let otp = await this.OtpRepo.findOneBy({ user_id })
         if (otp) {
             otp.code = code
@@ -129,36 +129,36 @@ export class AuthService {
                 user_id
             })
         }
-        let token:string
-        if(tokenType===TOKEN_TYPE.VERIFY){
-            token = this.tokenService.generateOtpToken({ user_id })
-        }else{
-            token = this.tokenService.createForgotPassToken({user_id})
-        }
+        const token = this.tokenService.generateOtpToken({ user_id , type:tokenType})
         await this.OtpRepo.save(otp)
         return {
             token,
             code:otp.code,
         }
     }
-    async checkOtp(code:string|number ,type:OTP_TYPE_ENUM){
-        
+    async checkOtp(code:string|number){
         const token = this.request.cookies?.[COOKIE_KEYS.OTP]
         if(!token) throw new UnauthorizedException(AuthMessage.EXPIRED_CODE)
         const payload = this.tokenService.verifyOtpToken(token)
+        const {type} = payload
         const otp = await this.OtpRepo.findOneBy({user_id:payload.user_id})
         if(!otp) throw new UnauthorizedException(AuthMessage.TRY_AGAIN)
         if(otp.code!=code) throw new UnauthorizedException(AuthMessage.INVALID_OTP)
         const now = new Date()
         if(otp.expires_in<now) throw new UnauthorizedException(AuthMessage.OTP_EXPIRED)
-        if(type===OTP_TYPE_ENUM.VERIFY_USER){
+        if(type===TOKEN_TYPE.VERIFY){
             const verify = await this.verifyUser(otp.user_id)
             if(!verify) throw new UnauthorizedException(AuthMessage.UNEXPECTED_ERR)
             return {
                 message:"account verified"
             }
+        }else{
+            const token = this.tokenService.createForgotPassToken({user_id:otp.user_id})
+            return {
+                message:"reset password authorized",
+                token
+            }
         }
-        return "check complete"
     }
     //is being used in Auth Guard do not delete
     async validateAccessToken(token:string){
@@ -192,7 +192,9 @@ export class AuthService {
         await this.mailService.sendMail(email,"forgot password code",`here is your password reset code: ${otp.code}`)
         return {
             message:"code sent",
-            token:otp.token
+            token:otp.token,
+            //for testing send code directly
+            code:otp.code
         }
     }
 }
