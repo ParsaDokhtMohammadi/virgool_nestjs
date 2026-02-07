@@ -19,6 +19,6 @@ export class UserEntity extends BaseEntity {
     created_at!:Date
     @UpdateDateColumn({default:new Date()})
     updated_at!:Date
-    @OneToOne(()=>OtpEntity,otp => otp.user,{onDelete:"CASCADE"})
+    @OneToOne(()=>OtpEntity,otp => otp.user)
     otp!:OtpEntity
 }

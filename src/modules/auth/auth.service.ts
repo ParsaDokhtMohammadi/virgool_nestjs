@@ -47,10 +47,19 @@ export class AuthService {
         if (!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
         const passCheck = this.comparePassword(password,user.password)
         if(!passCheck) throw new UnauthorizedException(LOGINMESSAGE.INCORRECT_PASSWORD)
+        if(user.verified!==true){
+            const otp = await this.sendOtp(user.id)
+            await this.mailService.sendMail(user.email , "verification code", `your code is: ${otp.code}`)
+            return {
+                message:"a verification code was to your email",
+                type:AuthTypes.REGISTER
+            }
+        }
         const token =  this.tokenService.createAccessToken({user_id:user.id})
         return {
             message : "login successful",
-            token
+            token,
+            type:AuthTypes.LOGIN
         }
 
 
@@ -73,6 +82,7 @@ export class AuthService {
         await this.mailService.sendMail(email,"register verification code",`your code is: ${otp.code}`)
         return {
             message:REGISTERMESSAGE.VERIFICATION_CODE_SENT,
+            type:AuthTypes.REGISTER,
             // code: otp.code,
             token:otp.token
         }

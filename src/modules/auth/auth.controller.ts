@@ -16,8 +16,7 @@ export class AuthController {
   @Post('user-existance')
   @ApiConsumes(urlEncoded , Json)
    async userExistance(@Body() authDto: AuthDto, @Res({ passthrough: true }) res: Response) {
-    const result = await this.authService.userExistance(authDto);
-
+    const result = await this.authService.userExistance(authDto);    
 
     if (result.token) {
       const cookieOptions = {
@@ -25,10 +24,10 @@ export class AuthController {
       };
 
  
-      if (authDto.type === AuthTypes.REGISTER) {
+      if (result.type === AuthTypes.REGISTER) {
         // OTP token: short expiry
         res.cookie(COOKIE_KEYS.OTP, result.token, { ...cookieOptions, maxAge: 1000 * 60 * 2 });
-      } else if (authDto.type === AuthTypes.LOGIN) {
+      } else if (result.type === AuthTypes.LOGIN) {
         // Access token: longer expiry (e.g., 1 year)
         res.cookie(COOKIE_KEYS.ACCESS, result.token, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 365 });
       }
