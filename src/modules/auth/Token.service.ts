@@ -41,4 +41,20 @@ export class TokenService {
             throw new UnauthorizedException(LOGINMESSAGE.LOGIN_AGAIN)
         }
     }
+    createForgotPassToken(payload:AccessTokenPayload){
+       const token = this.jwtService.sign(payload,{
+            secret:process.env.FORGOTPASS_TOKEN_SECRET,
+            expiresIn:"10m"
+        })
+        return token
+    }
+    verifyForgotPassToken(token:string){
+        try{
+            return this.jwtService.verify(token,{
+                secret:process.env.FORGOTPASS_TOKEN_SECRET
+            })
+        }catch(err){
+            throw new UnauthorizedException(LOGINMESSAGE.LOGIN_AGAIN)
+        }
+    }
 }

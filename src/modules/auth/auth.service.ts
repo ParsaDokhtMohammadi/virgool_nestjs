@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
-import { AuthTypes } from 'src/common/enums/type.enum';
+import { AUTH_RESULTS_ENUM, AuthTypes } from 'src/common/enums/type.enum';
 import { AuthMethod } from 'src/common/enums/method.enum';
 import { isEmail } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -52,14 +52,14 @@ export class AuthService {
             await this.mailService.sendMail(user.email , "verification code", `your code is: ${otp.code}`)
             return {
                 message:"a verification code was to your email",
-                type:AuthTypes.REGISTER
+                type:AUTH_RESULTS_ENUM.REGISTER
             }
         }
         const token =  this.tokenService.createAccessToken({user_id:user.id})
         return {
             message : "login successful",
             token,
-            type:AuthTypes.LOGIN
+            type:AUTH_RESULTS_ENUM.LOGIN
         }
 
 
@@ -82,7 +82,7 @@ export class AuthService {
         await this.mailService.sendMail(email,"register verification code",`your code is: ${otp.code}`)
         return {
             message:REGISTERMESSAGE.VERIFICATION_CODE_SENT,
-            type:AuthTypes.REGISTER,
+            type:AUTH_RESULTS_ENUM.REGISTER,
             // code: otp.code,
             token:otp.token
         }
@@ -174,5 +174,11 @@ export class AuthService {
         user.verified = true
         await this.UserRepo.save(user)
         return true
+    }
+    async forgotPassword(email:string){
+        if(!isEmail(email))throw new UnauthorizedException(REGISTERMESSAGE.INVAID_EMAIL_FORMAT)
+        const user = await this.UserRepo.findOneBy({email})
+        if(!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
+       
     }
 }

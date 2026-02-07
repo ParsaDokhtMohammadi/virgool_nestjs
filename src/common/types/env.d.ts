@@ -12,6 +12,7 @@ namespace NodeJS {
         COOKIE_SECRET:string
         OTP_TOKEN_SECRET:string
         ACCESS_TOKEN_SECRET:string
+        FORGOTPASS_TOKEN_SECRET:string
         //mail
         GMAIL_USER:string
         GMAIL_PASS:string
