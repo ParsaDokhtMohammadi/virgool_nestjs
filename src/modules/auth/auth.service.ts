@@ -146,6 +146,7 @@ export class AuthService {
         if(otp.code!=code) throw new UnauthorizedException(AuthMessage.INVALID_OTP)
         const now = new Date()
         if(otp.expires_in<now) throw new UnauthorizedException(AuthMessage.OTP_EXPIRED)
+        await this.OtpRepo.delete({ user_id: otp.user_id });
         if(type===TOKEN_TYPE.VERIFY){
             const verify = await this.verifyUser(otp.user_id)
             if(!verify) throw new UnauthorizedException(AuthMessage.UNEXPECTED_ERR)

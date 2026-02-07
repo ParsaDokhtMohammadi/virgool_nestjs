@@ -40,9 +40,9 @@ export class AuthController {
   async checkOtp(@Body() OtpDto:CheckOtpDto , @Res({ passthrough: true }) res: Response){
 
      const result = await this.authService.checkOtp(OtpDto.code)
+     res.clearCookie(COOKIE_KEYS.OTP, { httpOnly: true })
      if(result.token){
       res.cookie(COOKIE_KEYS.FORGOT_PASS,result.token,{httpOnly:true , maxAge:1000*60*10})
-
      }
        return result
      
@@ -63,8 +63,10 @@ export class AuthController {
   }
   @Post('reset-password')
   @ApiConsumes(urlEncoded,Json)
-  async resetPassword(@Body() Dto:ResetPasswordDto){
-    return this.authService.resetPassword(Dto)
+  async resetPassword(@Body() Dto:ResetPasswordDto ,@Res({ passthrough: true }) res: Response){
+    const result = this.authService.resetPassword(Dto)
+    res.clearCookie(COOKIE_KEYS.FORGOT_PASS, { httpOnly: true })
+    return result
   }
 
 }
