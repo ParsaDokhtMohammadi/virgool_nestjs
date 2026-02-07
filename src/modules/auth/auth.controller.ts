@@ -71,6 +71,10 @@ export class AuthController {
     res.clearCookie(COOKIE_KEYS.FORGOT_PASS, { httpOnly: true })
     return result
   }
-
+  @Get("logout")
+  logout(@Res({ passthrough: true }) res: Response){
+    res.clearCookie(COOKIE_KEYS.ACCESS,{httpOnly:true})
+    return {message:"logged out successfuly"}
+  }
 }
  
