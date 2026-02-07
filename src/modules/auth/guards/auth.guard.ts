@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
     }
 
     protected extractToken(request:Request){
-         const {authorization} = request.headers
+        const {authorization} = request.headers
         if(!authorization || authorization?.trim()=="") throw new UnauthorizedException(AuthMessage.LOGIN_REQUIRED)
         const [bearer, token] =authorization?.split(" ")
         if(bearer?.toLowerCase()!=="bearer"||!token || !isJWT(token))throw new UnauthorizedException(AuthMessage.LOGIN_REQUIRED)

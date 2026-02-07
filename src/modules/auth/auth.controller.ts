@@ -8,6 +8,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 import {AUTH_RESULTS_ENUM} from 'src/common/enums/type.enum';
 import { json } from 'stream/consumers';
+import { ResetPasswordGuard } from './guards/resetPass.guard';
 
 
 @Controller('auth')
@@ -62,9 +63,11 @@ export class AuthController {
     return result.code
   }
   @Post('reset-password')
+  @UseGuards(ResetPasswordGuard)
   @ApiConsumes(urlEncoded,Json)
-  async resetPassword(@Body() Dto:ResetPasswordDto ,@Res({ passthrough: true }) res: Response){
-    const result = this.authService.resetPassword(Dto)
+  async resetPassword(@Body() Dto:ResetPasswordDto ,@Req() req: Request ,@Res({ passthrough: true }) res: Response){
+    const  user  = req.user
+    const result = this.authService.resetPassword(Dto , user!.id)
     res.clearCookie(COOKIE_KEYS.FORGOT_PASS, { httpOnly: true })
     return result
   }

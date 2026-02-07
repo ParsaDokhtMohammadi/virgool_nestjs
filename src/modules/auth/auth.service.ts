@@ -198,13 +198,10 @@ export class AuthService {
             code:otp.code
         }
     }
-    async resetPassword(Dto:ResetPasswordDto){
-        const token = this.request.cookies?.[COOKIE_KEYS.FORGOT_PASS]
-        if(!token)throw new UnauthorizedException(RESET_PASS_MESSAGE.NO_COOKIE)
+    async resetPassword(Dto:ResetPasswordDto,id:number){
         const {confirm_new_password,new_password} = Dto
         if(confirm_new_password!==new_password)throw new UnauthorizedException(REGISTERMESSAGE.PASSWORD_MISMATCH)
-        const {user_id} = this.tokenService.verifyForgotPassToken(token)
-        const user =await this.UserRepo.findOneBy({id:user_id})
+        const user =await this.UserRepo.findOneBy({id})
         if(!user) throw new UnauthorizedException(RESET_PASS_MESSAGE.USER_NOT_EXIST)
         user.password = this.hashPassword(new_password)
         await this.UserRepo.save(user)
