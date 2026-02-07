@@ -7,3 +7,8 @@ export enum AUTH_RESULTS_ENUM {
     REGISTER = "register",
     FORGOT_PASS = "forgot_pass"
 }
+
+export enum TOKEN_TYPE {
+    FORGOTPASS = "forgot_pass",
+    VERIFY = "verify"
+}

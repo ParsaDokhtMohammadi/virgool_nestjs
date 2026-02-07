@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
-import { AUTH_RESULTS_ENUM, AuthTypes } from 'src/common/enums/type.enum';
+import { AUTH_RESULTS_ENUM, AuthTypes, TOKEN_TYPE } from 'src/common/enums/type.enum';
 import { AuthMethod } from 'src/common/enums/method.enum';
 import { isEmail } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -48,7 +48,7 @@ export class AuthService {
         const passCheck = this.comparePassword(password,user.password)
         if(!passCheck) throw new UnauthorizedException(LOGINMESSAGE.INCORRECT_PASSWORD)
         if(user.verified!==true){
-            const otp = await this.sendOtp(user.id)
+            const otp = await this.sendOtp(user.id,TOKEN_TYPE.VERIFY)
             await this.mailService.sendMail(user.email , "verification code", `your code is: ${otp.code}`)
             return {
                 message:"a verification code was to your email",
@@ -78,7 +78,7 @@ export class AuthService {
             password:hashedPassword
         })
         user = await this.UserRepo.save(user)
-        const otp = await this.sendOtp(user.id)
+        const otp = await this.sendOtp(user.id,TOKEN_TYPE.VERIFY)
         await this.mailService.sendMail(email,"register verification code",`your code is: ${otp.code}`)
         return {
             message:REGISTERMESSAGE.VERIFICATION_CODE_SENT,
@@ -112,9 +112,11 @@ export class AuthService {
         }
         else throw new BadRequestException(LOGINMESSAGE.INVALID_LOGIN_DATA)
     }
-    async sendOtp(user_id: number) {
+    async sendOtp(user_id: number , tokenType:TOKEN_TYPE) {
+        if (!Object.values(TOKEN_TYPE).includes(tokenType)) throw new BadRequestException("invalid request type")
         const code = randomInt(10000, 99999)
-        const expires_in = new Date(Date.now() + 1000 * 60 * 2)
+        const time = tokenType===TOKEN_TYPE.VERIFY ? 2 : 10
+        const expires_in = new Date(Date.now() + 1000 * 60 * time)
         let otp = await this.OtpRepo.findOneBy({ user_id })
         if (otp) {
             otp.code = code
@@ -127,11 +129,16 @@ export class AuthService {
                 user_id
             })
         }
-        const token = this.tokenService.generateOtpToken({ user_id })
+        let token:string
+        if(tokenType===TOKEN_TYPE.VERIFY){
+            token = this.tokenService.generateOtpToken({ user_id })
+        }else{
+            token = this.tokenService.createForgotPassToken({user_id})
+        }
         await this.OtpRepo.save(otp)
         return {
             token,
-            code:otp.code
+            code:otp.code,
         }
     }
     async checkOtp(code:string|number ,type:OTP_TYPE_ENUM){
@@ -179,6 +186,10 @@ export class AuthService {
         if(!isEmail(email))throw new UnauthorizedException(REGISTERMESSAGE.INVAID_EMAIL_FORMAT)
         const user = await this.UserRepo.findOneBy({email})
         if(!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
-       
+        const otp = await this.sendOtp(user.id,TOKEN_TYPE.FORGOTPASS)
+        await this.mailService.sendMail(email,"forgot password code",`here is your password reset code: ${otp.code}`)
+        return {
+            message:"code sent"
+        }
     }
 }

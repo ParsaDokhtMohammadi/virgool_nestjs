@@ -1,6 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { AccessTokenPayload, CookiePayload } from './types/payload';
+import { AccessTokenPayload, CookiePayload, ForgotPassTokenPayload } from './types/payload';
 import { AuthMessage, LOGINMESSAGE } from 'src/common/enums/message.enum';
 
 @Injectable()
@@ -41,7 +41,7 @@ export class TokenService {
             throw new UnauthorizedException(LOGINMESSAGE.LOGIN_AGAIN)
         }
     }
-    createForgotPassToken(payload:AccessTokenPayload){
+    createForgotPassToken(payload:ForgotPassTokenPayload){
        const token = this.jwtService.sign(payload,{
             secret:process.env.FORGOTPASS_TOKEN_SECRET,
             expiresIn:"10m"
