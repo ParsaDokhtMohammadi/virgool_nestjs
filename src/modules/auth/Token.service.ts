@@ -1,7 +1,7 @@
 import { JwtService } from '@nestjs/jwt';
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { AccessTokenPayload, CookiePayload, ForgotPassTokenPayload } from './types/payload';
-import { AuthMessage, LOGINMESSAGE } from 'src/common/enums/message.enum';
+import { AuthMessage, LOGINMESSAGE, RESET_PASS_MESSAGE } from 'src/common/enums/message.enum';
 
 @Injectable()
 export class TokenService {
@@ -54,7 +54,7 @@ export class TokenService {
                 secret:process.env.FORGOTPASS_TOKEN_SECRET
             })
         }catch(err){
-            throw new UnauthorizedException(LOGINMESSAGE.LOGIN_AGAIN)
+            throw new UnauthorizedException(RESET_PASS_MESSAGE.EXPIRED_TOKEN)
         }
     }
 }

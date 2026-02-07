@@ -41,3 +41,16 @@ export class ForgotPasswordDto {
     @IsEmail()
     email:string
 }
+
+export class ResetPasswordDto {
+    @ApiProperty()
+    @IsString()
+    @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/, {
+        message:
+        'Password must be at least 8 characters long and include uppercase, lowercase letters and a number',
+    })
+    new_password:string
+    @ApiProperty()
+    @IsString()
+    confirm_new_password:string
+}

@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
-import { AuthDto, ForgotPasswordDto } from './dto/auth.dto';
+import { AuthDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
 import { AUTH_RESULTS_ENUM, AuthTypes, TOKEN_TYPE } from 'src/common/enums/type.enum';
 import { AuthMethod } from 'src/common/enums/method.enum';
 import { isEmail } from 'class-validator';
@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ProfileEntity } from '../user/entities/profile.entity';
-import { AuthMessage, LOGINMESSAGE, REGISTERMESSAGE } from 'src/common/enums/message.enum';
+import { AuthMessage, LOGINMESSAGE, REGISTERMESSAGE, RESET_PASS_MESSAGE } from 'src/common/enums/message.enum';
 import { OtpEntity } from '../user/entities/otp.entity';
 import { randomInt } from 'crypto';
 import { nanoid } from 'nanoid';
@@ -196,5 +196,20 @@ export class AuthService {
             //for testing send code directly
             code:otp.code
         }
+    }
+    async resetPassword(Dto:ResetPasswordDto){
+        const token = this.request.cookies?.[COOKIE_KEYS.FORGOT_PASS]
+        if(!token)throw new UnauthorizedException(RESET_PASS_MESSAGE.NO_COOKIE)
+        const {confirm_new_password,new_password} = Dto
+        if(confirm_new_password!==new_password)throw new UnauthorizedException(REGISTERMESSAGE.PASSWORD_MISMATCH)
+        const {user_id} = this.tokenService.verifyForgotPassToken(token)
+        const user =await this.UserRepo.findOneBy({id:user_id})
+        if(!user) throw new UnauthorizedException(RESET_PASS_MESSAGE.USER_NOT_EXIST)
+        user.password = this.hashPassword(new_password)
+        await this.UserRepo.save(user)
+        return {
+            message:RESET_PASS_MESSAGE.SUCCESS
+        }
+       
     }
 }

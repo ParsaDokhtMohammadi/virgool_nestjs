@@ -1,12 +1,13 @@
 import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { AuthDto, CheckOtpDto, ForgotPasswordDto } from './dto/auth.dto';
+import { AuthDto, CheckOtpDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
 import { Json, urlEncoded } from 'src/common/constants/constants';
 import type { Request, Response } from 'express';
 import { AuthGuard } from './guards/auth.guard';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 import {AUTH_RESULTS_ENUM} from 'src/common/enums/type.enum';
+import { json } from 'stream/consumers';
 
 
 @Controller('auth')
@@ -41,11 +42,10 @@ export class AuthController {
      const result = await this.authService.checkOtp(OtpDto.code)
      if(result.token){
       res.cookie(COOKIE_KEYS.FORGOT_PASS,result.token,{httpOnly:true , maxAge:1000*60*10})
-      res.clearCookie(COOKIE_KEYS.OTP)
-     }else{
-      res.clearCookie(COOKIE_KEYS.OTP)
+
      }
-     return result
+       return result
+     
     
   }
   @Get('check-login')
@@ -60,6 +60,11 @@ export class AuthController {
     const result = await this.authService.forgotPassword(email)
     res.cookie(COOKIE_KEYS.OTP,result.token,{httpOnly:true,maxAge:1000*60*2})
     return result.code
+  }
+  @Post('reset-password')
+  @ApiConsumes(urlEncoded,Json)
+  async resetPassword(@Body() Dto:ResetPasswordDto){
+    return this.authService.resetPassword(Dto)
   }
 
 }

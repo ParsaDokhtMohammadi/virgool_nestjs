@@ -25,3 +25,9 @@ export enum REGISTERMESSAGE {
     VERIFICATION_CODE_SENT = "a verification code was sent to your account"
 }
 
+export enum RESET_PASS_MESSAGE {
+    NO_COOKIE = "you are not authorize to do this action",
+    EXPIRED_TOKEN = "issue another password reset request",
+    USER_NOT_EXIST = "user with this id does not exist",
+    SUCCESS = "password changed successFully"
+}
