@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { AuthDto, CheckOtpDto } from './dto/auth.dto';
+import { AuthDto, CheckOtpDto, ForgotPasswordDto } from './dto/auth.dto';
 import { Json, urlEncoded } from 'src/common/constants/constants';
 import type { Request, Response } from 'express';
 import { AuthGuard } from './guards/auth.guard';
@@ -31,13 +31,7 @@ export class AuthController {
         // Access token: longer expiry (e.g., 1 year)
         res.cookie(COOKIE_KEYS.ACCESS, result.token, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 365 });
       }
-      else if(result.type === AUTH_RESULTS_ENUM.FORGOT_PASS){
-        // forgot password token
-        res.cookie(COOKIE_KEYS.FORGOT_PASS,result.token,{...cookieOptions,maxAge:1000*60*10})
-      }
     }
-
-
     return result
   }
   @Post('check-otp')
@@ -52,6 +46,13 @@ export class AuthController {
   @UseGuards(AuthGuard)
   checkLogin(@Req() req:Request){
     return req.user
+  }
+  @Post('forgot-password')
+  @ApiConsumes(urlEncoded,Json)
+  async forgotPassword(@Body() email:ForgotPasswordDto , @Res({ passthrough: true }) res: Response){
+    const result =await this.authService.forgotPassword(email)
+    res.cookie(COOKIE_KEYS.FORGOT_PASS,result.token,{httpOnly:true,maxAge:1000*60*2})
+    return result.message
   }
 
 }

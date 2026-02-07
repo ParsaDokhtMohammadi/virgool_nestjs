@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto, ForgotPasswordDto } from './dto/auth.dto';
 import { AUTH_RESULTS_ENUM, AuthTypes, TOKEN_TYPE } from 'src/common/enums/type.enum';
 import { AuthMethod } from 'src/common/enums/method.enum';
 import { isEmail } from 'class-validator';
@@ -142,6 +142,7 @@ export class AuthService {
         }
     }
     async checkOtp(code:string|number ,type:OTP_TYPE_ENUM){
+        
         const token = this.request.cookies?.[COOKIE_KEYS.OTP]
         if(!token) throw new UnauthorizedException(AuthMessage.EXPIRED_CODE)
         const payload = this.tokenService.verifyOtpToken(token)
@@ -182,14 +183,16 @@ export class AuthService {
         await this.UserRepo.save(user)
         return true
     }
-    async forgotPassword(email:string){
+    async forgotPassword(dto:ForgotPasswordDto){
+        const {email} = dto
         if(!isEmail(email))throw new UnauthorizedException(REGISTERMESSAGE.INVAID_EMAIL_FORMAT)
         const user = await this.UserRepo.findOneBy({email})
         if(!user) throw new UnauthorizedException(LOGINMESSAGE.USER_NOT_EXISTS)
         const otp = await this.sendOtp(user.id,TOKEN_TYPE.FORGOTPASS)
         await this.mailService.sendMail(email,"forgot password code",`here is your password reset code: ${otp.code}`)
         return {
-            message:"code sent"
+            message:"code sent",
+            token:otp.token
         }
     }
 }

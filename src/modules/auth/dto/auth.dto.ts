@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Length, Matches } from "class-validator"
+import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Length, Matches } from "class-validator"
 import { OTP_TYPE_ENUM } from "src/common/enums/checkOtpType.enum"
 import { AuthMethod } from "src/common/enums/method.enum"
 import { AuthTypes } from "src/common/enums/type.enum"
@@ -37,4 +37,10 @@ export class CheckOtpDto {
     @ApiProperty({enum:OTP_TYPE_ENUM})
     @IsEnum(OTP_TYPE_ENUM)
     type:OTP_TYPE_ENUM
+}
+
+export class ForgotPasswordDto {
+    @ApiProperty()
+    @IsEmail()
+    email:string
 }
