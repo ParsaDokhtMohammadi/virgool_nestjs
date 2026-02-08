@@ -10,6 +10,7 @@ import { MailService } from './mail.service';
   imports : [UserModule],
   controllers: [AuthController],
   providers: [AuthService , TokenService ,JwtService , MailService],
+  exports: [AuthService , TokenService ,JwtService , MailService]
 
 })
 export class AuthModule {}

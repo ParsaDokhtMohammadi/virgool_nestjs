@@ -5,6 +5,7 @@ import { join } from 'path';
 import { TypeOrmConfig } from './config/typeoem.config';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CategoryModule } from './modules/category/category.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -13,7 +14,8 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
     TypeOrmModule.forRoot(TypeOrmConfig()),
     UserModule,
-    AuthModule
+    AuthModule,
+    CategoryModule
   ],
   controllers: [],
   providers: []
