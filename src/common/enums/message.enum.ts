@@ -31,3 +31,16 @@ export enum RESET_PASS_MESSAGE {
     USER_NOT_EXIST = "user with this id does not exist",
     SUCCESS = "password changed successFully"
 }
+
+
+//public
+export enum PUBLIC_MESSAGES {
+    
+}
+
+
+//Category
+export enum CATEGORY_MESSAGES {
+ CONFLICT = "a title with this name already exists"
+}
+
