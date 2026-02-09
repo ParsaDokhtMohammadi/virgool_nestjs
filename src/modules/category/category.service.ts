@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entities/category.entity';
 import { Repository } from 'typeorm';
 import { CATEGORY_MESSAGES } from 'src/common/enums/message.enum';
+import { paginationGenerator, PaginationResolver } from 'src/common/utils/pagination.utils';
 
 @Injectable()
 export class CategoryService {
@@ -31,9 +32,17 @@ export class CategoryService {
     return title
   }
 
-  findAll(Dto:PaginationDto) {
-    const {page,limit} = Dto
-    return  this.categoryRepo.findBy({});
+  async findAll(Dto:PaginationDto) {
+    const {limit , page , skip} = PaginationResolver(Dto)
+    const [categories,count] = await this.categoryRepo.findAndCount({
+      where:{},
+      skip,
+      take:limit
+    })
+    return {
+      pagination : paginationGenerator(count,page,limit),
+      categories
+    }
   }
 
   findOne(id: number) {
