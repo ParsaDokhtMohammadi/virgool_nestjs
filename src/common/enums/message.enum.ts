@@ -41,6 +41,10 @@ export enum PUBLIC_MESSAGES {
 
 //Category
 export enum CATEGORY_MESSAGES {
- CONFLICT = "a title with this name already exists"
+ CONFLICT = "a title with this name already exists",
+ NOT_FOUND = "no category found",
+ DELETED = "category deleted",
+ INVALID_UPDATE_DATA = "no data was sent to update",
+ UPDATE_SUCCESS = "category updated"
 }
 
