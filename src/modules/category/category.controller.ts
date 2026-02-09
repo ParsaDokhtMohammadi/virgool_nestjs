@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Json, urlEncoded } from 'src/common/constants/constants';
+import { PaginationDto } from 'src/common/Dtos/pagination.dto';
+import { Pagination } from 'src/common/decorators/pagination.decorator';
 
 @Controller('category')
 @ApiTags("Category")
@@ -10,13 +13,15 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
+  @ApiConsumes(urlEncoded,Json)
   async create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
 
   @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  @Pagination()
+  findAll(@Query() paginationDto:PaginationDto) {
+    return this.categoryService.findAll(paginationDto);
   }
 
   @Get(':id')

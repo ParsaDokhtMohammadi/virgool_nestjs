@@ -1,3 +1,4 @@
+import { PaginationDto } from 'src/common/Dtos/pagination.dto';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -30,8 +31,9 @@ export class CategoryService {
     return title
   }
 
-  findAll() {
-    return `This action returns all category`;
+  findAll(Dto:PaginationDto) {
+    const {page,limit} = Dto
+    return  this.categoryRepo.findBy({});
   }
 
   findOne(id: number) {
