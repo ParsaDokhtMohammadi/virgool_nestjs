@@ -22,7 +22,16 @@ export class UserService {
   }
  async changeProfile(files:any,Dto:ProfileDto){
    const user = this.request.user;
-   console.log(files);
+   let {image_profile , image_bg} = files
+   if(image_profile?.length > 0) {
+    let [image] = image_profile
+    Dto.image_profile = image.path
+   }
+   if(image_bg?.length > 0) {
+    let [image] = image_bg
+    Dto.image_bg = image.path
+    
+   }
   if (!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
   const { id } = user
   let profile = await this.ProfileRepo.findOneBy({user_id:id})
@@ -34,9 +43,21 @@ export class UserService {
     if(linkedin_profile) profile.linkedin_profile = linkedin_profile
     if(x_profile) profile.x_profile = x_profile
     if(nick_name) profile.nick_name = nick_name
+    if(image_bg) profile.image_bg = Dto.image_bg
+    if(image_profile) profile.image_profile = Dto.image_profile
   }else{
     profile = this.ProfileRepo.create(
-      {bio,birthday,gender,linkedin_profile,nick_name,x_profile,user_id:id}
+      {
+        bio,
+        birthday,
+        gender,
+        linkedin_profile,
+        nick_name,
+        x_profile,
+        image_bg,
+        image_profile,
+        user_id:id
+      }
     )
   }
   await this.ProfileRepo.save(profile)

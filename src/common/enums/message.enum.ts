@@ -51,4 +51,8 @@ export enum CATEGORY_MESSAGES {
 export enum PROFILE_MESSAGES {
     NOT_LOGGEDIN = "please login"
 }
+//images
+export enum IMAGE_MESSAGES {
+    INVALID_FORMAT = "invalid image format only jpg png jpeg amd webp allowed"
+}
 
