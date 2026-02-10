@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { ProfileEntity } from './entities/profile.entity';
 import { REQUEST } from '@nestjs/core';
 import type{ AuthRequest } from 'src/common/types/authRequest.type';
+import { PROFILE_MESSAGES } from 'src/common/enums/message.enum';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -19,7 +20,7 @@ export class UserService {
   }
  async changeProfile(Dto:ProfileDto){
   const user = this.request.user;
-  if (!user) throw new UnauthorizedException();
-  const { id } = user;
+  if (!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
+  const { id } = user
  }
 }

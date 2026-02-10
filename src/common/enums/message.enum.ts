@@ -47,4 +47,8 @@ export enum CATEGORY_MESSAGES {
  INVALID_UPDATE_DATA = "no data was sent to update",
  UPDATE_SUCCESS = "category updated"
 }
+//Profile
+export enum PROFILE_MESSAGES {
+    NOT_LOGGEDIN = "please login"
+}
 
