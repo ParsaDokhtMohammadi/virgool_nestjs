@@ -26,11 +26,11 @@ export class UserService {
    let {image_profile , image_bg} = files
    if(image_profile?.length > 0) {
     let [image] = image_profile
-    Dto.image_profile = image.path
+    Dto.image_profile = image?.path?.slice(7)
    }
    if(image_bg?.length > 0) {
     let [image] = image_bg
-    Dto.image_bg = image.path
+    Dto.image_bg = image?.path?.slice(7)
     
    }
   if (!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
