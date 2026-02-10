@@ -22,5 +22,14 @@ export class UserService {
   const user = this.request.user;
   if (!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
   const { id } = user
+  console.log(id);
+  let profile = await this.ProfileRepo.findOneBy({user_id:id})
+  return id
+  if(profile) {
+
+  }else{
+
+  }
  }
+
 }

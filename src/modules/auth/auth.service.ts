@@ -53,7 +53,8 @@ export class AuthService {
             await this.mailService.sendMail(user.email , "verification code", `your code is: ${otp.code}`)
             return {
                 message:"a verification code was to your email",
-                type:AUTH_RESULTS_ENUM.REGISTER
+                type:AUTH_RESULTS_ENUM.REGISTER,
+                token:otp.token
             }
         }
         const token =  this.tokenService.createAccessToken({user_id:user.id})
