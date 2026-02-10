@@ -9,6 +9,7 @@ import type{ AuthRequest } from 'src/common/types/authRequest.type';
 import { PROFILE_MESSAGES } from 'src/common/enums/message.enum';
 import { isDate } from 'class-validator';
 import { GENDER_ENUM } from 'src/common/enums/gender.enum';
+import { ProfileImages } from './types/files.type';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -20,7 +21,7 @@ export class UserService {
   ){
 
   }
- async changeProfile(files:any,Dto:ProfileDto){
+ async changeProfile(files:ProfileImages,Dto:ProfileDto){ 
    const user = this.request.user;
    let {image_profile , image_bg} = files
    if(image_profile?.length > 0) {
@@ -54,13 +55,21 @@ export class UserService {
         linkedin_profile,
         nick_name,
         x_profile,
-        image_bg,
-        image_profile,
+        image_bg:Dto.image_bg,
+        image_profile:Dto.image_profile,
         user_id:id
       }
     )
   }
   await this.ProfileRepo.save(profile)
  }
-
+ getProfile(){
+  const user = this.request.user
+  if (!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
+  const {id} = user
+  return this.userRepo.findOne({
+    where:{id},
+    relations:['profile']
+  })
+ }
 }

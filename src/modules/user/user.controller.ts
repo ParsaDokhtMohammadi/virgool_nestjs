@@ -4,7 +4,8 @@ import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { ProfileDto } from './dto/profile.dto';
 import { MultipartData } from 'src/common/constants/constants';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { ProfileFileUploader } from 'src/common/decorators/uploader.decorator';
+import { ProfileFileUploader } from 'src/common/decorators/uploaderProfile.decorator';
+import type{ ProfileImages } from './types/files.type';
 
 @Controller('user')
 @ApiTags("user")
@@ -19,9 +20,15 @@ export class UserController {
     @UploadedFiles(new ParseFilePipe({
       fileIsRequired:false
       ,validators:[]
-      })) files:any,
+      })) files:ProfileImages,
     @Body() profileDto:ProfileDto
   ){
     return this.userService.changeProfile(files,profileDto)
+  }
+  @Get()
+  @ApiBearerAuth("Authorization")
+  @UseGuards(AuthGuard)
+  getProfile(){
+    return this.userService.getProfile()
   }
 }

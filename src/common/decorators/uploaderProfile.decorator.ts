@@ -1,7 +1,6 @@
 import { applyDecorators, UseInterceptors } from "@nestjs/common";
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import { multerDestination, multerFileName } from "../utils/multer.utils";
+import {  multerStorage } from "../utils/multer.utils";
 
 export function ProfileFileUploader(){
     return applyDecorators(
@@ -9,10 +8,7 @@ export function ProfileFileUploader(){
             {name:"image_profile",maxCount:1},
             {name:"image_bg",maxCount:1},
           ],{
-            storage:diskStorage({
-              destination:multerDestination("user-profile"),
-              filename:multerFileName
-            })
+            storage:multerStorage("user-profile")
           }
             ))
     )

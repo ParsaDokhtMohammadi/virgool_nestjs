@@ -4,6 +4,7 @@ import { extname, join } from 'path';
 import { AuthRequest } from 'src/common/types/authRequest.type';
 import { IMAGE_MESSAGES } from '../enums/message.enum';
 import { BadRequestException } from '@nestjs/common';
+import { diskStorage } from 'multer';
 
 export type callbackDestinationType = (error: Error|null, destination: string) => void
 export type callbackFileNameType = (error: Error|null, filename: string) => void
@@ -36,3 +37,10 @@ export function multerFileName(
 function validateFormat (ext:string){
     return [".png",".jpg",".jpeg",".webp"].includes(ext)
 }
+
+export function multerStorage(folderName:string) {
+            return diskStorage({
+              destination:multerDestination(folderName),
+              filename:multerFileName
+            })
+          }
