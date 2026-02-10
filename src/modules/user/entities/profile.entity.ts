@@ -18,4 +18,6 @@ export class ProfileEntity extends BaseEntity {
     birthday:Date
     @Column({nullable:true})
     linkedin_profile:string
+    @Column({nullable:true})
+    x_profile:string
 }

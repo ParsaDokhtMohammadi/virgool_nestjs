@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -17,25 +17,26 @@ export class CategoryController {
   async create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
-
+  
   @Get()
   @Pagination()
   findAll(@Query() paginationDto:PaginationDto) {
     return this.categoryService.findAll(paginationDto);
   }
-
+  
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id',ParseIntPipe) id: string) {
     return this.categoryService.findOne(+id);
   }
-
+  
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+  @ApiConsumes(urlEncoded,Json)
+  update(@Param('id',ParseIntPipe) id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoryService.update(+id, updateCategoryDto);
   }
-
+  
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id',ParseIntPipe) id: string) {
     return this.categoryService.remove(+id);
   }
 }
