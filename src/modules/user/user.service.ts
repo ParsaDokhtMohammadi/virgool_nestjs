@@ -7,6 +7,8 @@ import { ProfileEntity } from './entities/profile.entity';
 import { REQUEST } from '@nestjs/core';
 import type{ AuthRequest } from 'src/common/types/authRequest.type';
 import { PROFILE_MESSAGES } from 'src/common/enums/message.enum';
+import { isDate } from 'class-validator';
+import { GENDER_ENUM } from 'src/common/enums/gender.enum';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -24,12 +26,20 @@ export class UserService {
   const { id } = user
   console.log(id);
   let profile = await this.ProfileRepo.findOneBy({user_id:id})
-  return id
+  const {bio,birthday,gender,linkedin_profile,nick_name,x_profile} = Dto
   if(profile) {
-
+    if(bio) profile.bio = bio
+    if(birthday&&isDate(new Date(birthday))) profile.birthday = birthday
+    if(gender&&Object.values(GENDER_ENUM as any).includes(gender)) profile.gender = gender
+    if(linkedin_profile) profile.linkedin_profile = linkedin_profile
+    if(x_profile) profile.x_profile = x_profile
+    if(nick_name) profile.nick_name = nick_name
   }else{
-
+    profile = this.ProfileRepo.create(
+      {bio,birthday,gender,linkedin_profile,nick_name,x_profile,user_id:id}
+    )
   }
+  await this.ProfileRepo.save(profile)
  }
 
 }
