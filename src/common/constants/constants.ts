@@ -1,3 +1,3 @@
 export const urlEncoded = "application/x-www-form-urlencoded"
 export const Json = "application/json"
-export const MultipartData = "multipart/data"
+export const MultipartData = "multipart/form-data"

@@ -12,9 +12,7 @@ export class AuthGuard implements CanActivate {
         const httpContext = context.switchToHttp()
         const request:AuthRequest = httpContext.getRequest<AuthRequest>()
         const token = this.extractToken(request)
-        request.user = await this.authService.validateAccessToken(token)
-        console.log("request.user: ",request.user);
-        
+        request.user = await this.authService.validateAccessToken(token)       
         return true
     }
 

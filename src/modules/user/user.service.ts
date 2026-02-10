@@ -20,11 +20,11 @@ export class UserService {
   ){
 
   }
- async changeProfile(Dto:ProfileDto){
-  const user = this.request.user;
+ async changeProfile(files:any,Dto:ProfileDto){
+   const user = this.request.user;
+   console.log(files);
   if (!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
   const { id } = user
-  console.log(id);
   let profile = await this.ProfileRepo.findOneBy({user_id:id})
   const {bio,birthday,gender,linkedin_profile,nick_name,x_profile} = Dto
   if(profile) {
