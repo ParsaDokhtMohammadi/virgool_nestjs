@@ -62,6 +62,9 @@ export class UserService {
     )
   }
   await this.ProfileRepo.save(profile)
+  return {
+    message:PROFILE_MESSAGES.UPDATED
+  }
  }
  getProfile(){
   const user = this.request.user

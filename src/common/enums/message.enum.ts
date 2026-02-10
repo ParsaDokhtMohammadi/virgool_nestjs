@@ -49,7 +49,8 @@ export enum CATEGORY_MESSAGES {
 }
 //Profile
 export enum PROFILE_MESSAGES {
-    NOT_LOGGEDIN = "please login"
+    NOT_LOGGEDIN = "please login",
+    UPDATED = "profile updated"
 }
 //images
 export enum IMAGE_MESSAGES {
