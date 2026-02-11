@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, ParseFilePipe, UseGuards, UploadedFiles, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, ParseFilePipe, UseGuards, UploadedFiles, Res, Patch } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { ProfileDto } from './dto/profile.dto';
@@ -6,7 +6,7 @@ import { Json, MultipartData, urlEncoded } from 'src/common/constants/constants'
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { ProfileFileUploader } from 'src/common/decorators/uploaderProfile.decorator';
 import type{ ProfileImages } from './types/files.type';
-import { changeEmailDto } from './dto/changeEmail.dto';
+import { changeEmailDto, changeUsernameDto } from './dto/changeCredentials.dto';
 import type{ Response } from 'express';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 
@@ -34,9 +34,9 @@ export class UserController {
   getProfile(){
     return this.userService.getProfile()
   }
-  @Post("/change-email")
+  @Patch("/change-email")
   @ApiBearerAuth("Authorization")
-  @ApiConsumes(Json,urlEncoded)
+  @ApiConsumes(urlEncoded,Json)
   @UseGuards(AuthGuard)
   async changeEmail(@Body() dto:changeEmailDto , @Res({ passthrough: true }) res: Response){
     const result = await this.userService.changeEmail(dto)
@@ -46,4 +46,14 @@ export class UserController {
     return result
     
   }
+  @Patch("/change-username")
+  @ApiBearerAuth("Authorization")
+  @ApiConsumes(urlEncoded,Json)
+  @UseGuards(AuthGuard)
+  changeUsername(@Body() dto:changeUsernameDto , @Res({ passthrough: true }) res: Response){
+    return this.userService.changeUsername(dto)
+     
+    
+  }
 }
+

@@ -13,7 +13,7 @@ import { isDate, isEmail } from 'class-validator';
 import { GENDER_ENUM } from 'src/common/enums/gender.enum';
 import { ProfileImages } from './types/files.type';
 import { TOKEN_TYPE } from 'src/common/enums/type.enum';
-import { changeEmailDto } from './dto/changeEmail.dto';
+import { changeEmailDto, changeUsernameDto } from './dto/changeCredentials.dto';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -97,6 +97,20 @@ export class UserService {
     return {
       message:PROFILE_MESSAGES.EMAIL_CHANGE_OTP,
       token:otp.token
+    } 
+ }
+ async changeUsername({username}:changeUsernameDto){
+    const LogedIn = this.request.user;
+    if (!LogedIn) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
+    const { id } = LogedIn
+    const user = await this.userRepo.findOneBy({id})
+    if(!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOTFOUND)
+    if(user.id!==id) throw new ConflictException(PROFILE_MESSAGES.USERNAME_CONFLICT)
+    if(username===user.username) throw new BadRequestException(PROFILE_MESSAGES.SAME_USERNAME_UPDATE)
+    user.username = username
+    await this.userRepo.save(user)
+    return {
+      message:PROFILE_MESSAGES.USERNAME_SUCCESS,
     } 
  }
 }
