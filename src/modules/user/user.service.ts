@@ -1,4 +1,5 @@
-import { Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from './../auth/auth.service';
+import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { ProfileDto } from './dto/profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -7,9 +8,10 @@ import { ProfileEntity } from './entities/profile.entity';
 import { REQUEST } from '@nestjs/core';
 import type{ AuthRequest } from 'src/common/types/authRequest.type';
 import { PROFILE_MESSAGES } from 'src/common/enums/message.enum';
-import { isDate } from 'class-validator';
+import { isDate, isEmail } from 'class-validator';
 import { GENDER_ENUM } from 'src/common/enums/gender.enum';
 import { ProfileImages } from './types/files.type';
+import { TOKEN_TYPE } from 'src/common/enums/type.enum';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -17,12 +19,15 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity) private userRepo:Repository<UserEntity>,
     @InjectRepository(ProfileEntity) private ProfileRepo:Repository<ProfileEntity>,
-    @Inject(REQUEST) private request:AuthRequest
+    @Inject(REQUEST) private request:AuthRequest,
+    private authService:AuthService
   ){
 
   }
  async changeProfile(files:ProfileImages,Dto:ProfileDto){ 
    const user = this.request.user;
+   if (!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
+   const { id } = user
    let {image_profile , image_bg} = files
    if(image_profile?.length > 0) {
     let [image] = image_profile
@@ -33,8 +38,6 @@ export class UserService {
     Dto.image_bg = image?.path?.slice(7)
     
    }
-  if (!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
-  const { id } = user
   let profile = await this.ProfileRepo.findOneBy({user_id:id})
   const {bio,birthday,gender,linkedin_profile,nick_name,x_profile} = Dto
   if(profile) {
@@ -74,5 +77,21 @@ export class UserService {
     where:{id},
     relations:['profile']
   })
+ }
+ async changeEmail(email:string){
+    const LogedIn = this.request.user;
+    if (!LogedIn) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
+    const { id } = LogedIn
+    if(!isEmail(email)) throw new BadRequestException(PROFILE_MESSAGES.INVALID_EMAIL)
+    const user = await this.userRepo.findOneBy({email})
+    if(!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOTFOUND)
+    if(user.id!==id) throw new ConflictException(PROFILE_MESSAGES.CONFLICT_EMAIL)
+    if(email===user.email) throw new BadRequestException(PROFILE_MESSAGES.SAME_EMAIL_UPDATE)
+    user.pending_email = email
+    await this.userRepo.save(user)
+    this.authService.sendOtp(id,TOKEN_TYPE.CHANGE_EMAIL)
+    return {
+      message:PROFILE_MESSAGES.EMAIL_CHANGE_OTP
+    } 
  }
 }

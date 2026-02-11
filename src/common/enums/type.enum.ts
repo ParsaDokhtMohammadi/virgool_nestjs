@@ -10,5 +10,6 @@ export enum AUTH_RESULTS_ENUM {
 
 export enum TOKEN_TYPE {
     FORGOTPASS = "forgot_pass",
-    VERIFY = "verify"
+    VERIFY = "verify",
+    CHANGE_EMAIL = "change_email"
 }

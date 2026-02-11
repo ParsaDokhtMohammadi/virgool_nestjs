@@ -50,7 +50,13 @@ export enum CATEGORY_MESSAGES {
 //Profile
 export enum PROFILE_MESSAGES {
     NOT_LOGGEDIN = "please login",
-    UPDATED = "profile updated"
+    UPDATED = "profile updated",
+    NOTFOUND = "user with this email was not found",
+    CONFLICT_EMAIL = "a user with this email already exists",
+    SAME_EMAIL_UPDATE = "new email cant match the current email",
+    EMAIL_CHANGE_SUCCESS = "email updated successfully",
+    INVALID_EMAIL = "invalid email format",
+    EMAIL_CHANGE_OTP = "a code was sent to your email"
 }
 //images
 export enum IMAGE_MESSAGES {

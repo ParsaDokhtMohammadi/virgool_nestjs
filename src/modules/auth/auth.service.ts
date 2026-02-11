@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from '@nestjs/common';
 import { AuthDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
 import { AUTH_RESULTS_ENUM, AuthTypes, TOKEN_TYPE } from 'src/common/enums/type.enum';
 import { AuthMethod } from 'src/common/enums/method.enum';
@@ -17,8 +17,6 @@ import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 import { REQUEST } from '@nestjs/core';
 import {hashSync,genSaltSync, compareSync} from "bcrypt"
 import { MailService } from './mail.service';
-import { OTP_TYPE_ENUM } from 'src/common/enums/checkOtpType.enum';
-import { CookiePayload } from './types/payload';
 
 @Injectable({scope:Scope.REQUEST})
 export class AuthService {
@@ -154,12 +152,15 @@ export class AuthService {
             return {
                 message:"account verified"
             }
-        }else{
+        }else if(type===TOKEN_TYPE.FORGOTPASS){
             const token = this.tokenService.createForgotPassToken({user_id:otp.user_id})
             return {
                 message:"reset password authorized",
                 token
             }
+        }
+        else{
+            await this.changeEmail(otp.user_id)
         }
     }
     //is being used in Auth Guard do not delete
@@ -209,6 +210,17 @@ export class AuthService {
         return {
             message:RESET_PASS_MESSAGE.SUCCESS
         }
-       
+    }
+    async changeEmail(id:number){
+        const user = await this.UserRepo.findOneBy({id})
+        if(!user) throw new NotFoundException(LOGINMESSAGE.USER_NOT_EXISTS)
+        const newEmail = user.pending_email
+        if(!newEmail) throw new BadRequestException("no email given")
+        user.email = newEmail
+        user.pending_email=null
+        await this.UserRepo.save(user)
+        return {
+            message:"email changed"
+        }
     }
 }
