@@ -12,8 +12,8 @@ export class UserEntity extends BaseEntity {
     mobile?:string
     @Column({unique:true})
     email!:string
-    @Column({nullable:true})
-    pending_email!:string|null
+    @Column({type: 'varchar',nullable:true})
+    pending_email:string|null
     @Column()
     password:string
     @Column({default:false})

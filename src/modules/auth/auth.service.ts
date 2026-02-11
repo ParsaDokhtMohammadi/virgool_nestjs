@@ -112,7 +112,7 @@ export class AuthService {
         }
         else throw new BadRequestException(LOGINMESSAGE.INVALID_LOGIN_DATA)
     }
-    async sendOtp(user_id: number , tokenType:TOKEN_TYPE) {
+    async sendOtp(user_id: number , tokenType:TOKEN_TYPE) {        
         if (!Object.values(TOKEN_TYPE).includes(tokenType)) throw new BadRequestException("invalid request type")
         const code = randomInt(10000, 99999)
         const expires_in = new Date(Date.now() + 1000 * 60 * 2)
@@ -161,6 +161,9 @@ export class AuthService {
         }
         else{
             await this.changeEmail(otp.user_id)
+            return {
+                message:"email changed successfully"
+            }
         }
     }
     //is being used in Auth Guard do not delete
@@ -219,8 +222,5 @@ export class AuthService {
         user.email = newEmail
         user.pending_email=null
         await this.UserRepo.save(user)
-        return {
-            message:"email changed"
-        }
     }
 }

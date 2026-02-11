@@ -1,3 +1,4 @@
+import { MailService } from './../auth/mail.service';
 import { AuthService } from './../auth/auth.service';
 import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { ProfileDto } from './dto/profile.dto';
@@ -12,6 +13,7 @@ import { isDate, isEmail } from 'class-validator';
 import { GENDER_ENUM } from 'src/common/enums/gender.enum';
 import { ProfileImages } from './types/files.type';
 import { TOKEN_TYPE } from 'src/common/enums/type.enum';
+import { changeEmailDto } from './dto/changeEmail.dto';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -20,7 +22,8 @@ export class UserService {
     @InjectRepository(UserEntity) private userRepo:Repository<UserEntity>,
     @InjectRepository(ProfileEntity) private ProfileRepo:Repository<ProfileEntity>,
     @Inject(REQUEST) private request:AuthRequest,
-    private authService:AuthService
+    private authService:AuthService,
+    private mailService:MailService
   ){
 
   }
@@ -78,20 +81,22 @@ export class UserService {
     relations:['profile']
   })
  }
- async changeEmail(email:string){
+ async changeEmail({email}:changeEmailDto){
     const LogedIn = this.request.user;
     if (!LogedIn) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
     const { id } = LogedIn
     if(!isEmail(email)) throw new BadRequestException(PROFILE_MESSAGES.INVALID_EMAIL)
-    const user = await this.userRepo.findOneBy({email})
+    const user = await this.userRepo.findOneBy({id})
     if(!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOTFOUND)
     if(user.id!==id) throw new ConflictException(PROFILE_MESSAGES.CONFLICT_EMAIL)
     if(email===user.email) throw new BadRequestException(PROFILE_MESSAGES.SAME_EMAIL_UPDATE)
     user.pending_email = email
     await this.userRepo.save(user)
-    this.authService.sendOtp(id,TOKEN_TYPE.CHANGE_EMAIL)
+    const otp = await this.authService.sendOtp(id,TOKEN_TYPE.CHANGE_EMAIL)
+    await this.mailService.sendMail(email,"change email verification code",`change email verification code: ${otp.code}`)
     return {
-      message:PROFILE_MESSAGES.EMAIL_CHANGE_OTP
+      message:PROFILE_MESSAGES.EMAIL_CHANGE_OTP,
+      token:otp.token
     } 
  }
 }
