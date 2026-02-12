@@ -1,8 +1,9 @@
 import { BaseEntity } from './../../../common/abstracts/base.entity';
 import { EntityNames } from "src/common/enums/entity.enum";
-import { Column, CreateDateColumn, Entity, OneToOne, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, UpdateDateColumn } from "typeorm";
 import { OtpEntity } from './otp.entity';
 import { ProfileEntity } from './profile.entity';
+import { BlogEntity } from 'src/modules/blog/entities/blog.entity';
 
 @Entity(EntityNames.USER)
 export class UserEntity extends BaseEntity {
@@ -26,4 +27,6 @@ export class UserEntity extends BaseEntity {
     otp!:OtpEntity
     @OneToOne(()=>ProfileEntity , profile => profile.user,{onDelete:"CASCADE"})
     profile:ProfileEntity
+    @OneToMany(()=>BlogEntity,blogs=>blogs.user)
+    blogs:BlogEntity[]
 }
