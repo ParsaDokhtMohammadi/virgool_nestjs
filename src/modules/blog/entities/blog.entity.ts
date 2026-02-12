@@ -2,7 +2,8 @@ import { BaseEntity } from "src/common/abstracts/base.entity";
 import { BLOG_STATUS } from "src/common/enums/blogStatus.enum";
 import { EntityNames } from "src/common/enums/entity.enum";
 import { UserEntity } from "src/modules/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
+import { BlogLikesEntity } from "./like.entity";
 
 @Entity(EntityNames.BLOG)
 export class BlogEntity extends BaseEntity {
@@ -21,6 +22,8 @@ export class BlogEntity extends BaseEntity {
     @ManyToOne(()=>UserEntity , user=>user.blogs,{onDelete:"CASCADE"})
     @JoinColumn({name:"author_id"})
     user:UserEntity
+    @OneToMany(()=>BlogLikesEntity,likes=>likes.blog)
+    likes:BlogLikesEntity[]
     @CreateDateColumn()
     created_at:Date
     @UpdateDateColumn()

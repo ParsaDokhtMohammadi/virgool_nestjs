@@ -4,6 +4,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, UpdateDateColumn
 import { OtpEntity } from './otp.entity';
 import { ProfileEntity } from './profile.entity';
 import { BlogEntity } from 'src/modules/blog/entities/blog.entity';
+import { BlogLikesEntity } from 'src/modules/blog/entities/like.entity';
 
 @Entity(EntityNames.USER)
 export class UserEntity extends BaseEntity {
@@ -29,4 +30,6 @@ export class UserEntity extends BaseEntity {
     profile:ProfileEntity
     @OneToMany(()=>BlogEntity,blogs=>blogs.user)
     blogs:BlogEntity[]
+    @OneToMany(()=>BlogLikesEntity,likes=>likes.user)
+    blog_likes:BlogLikesEntity[]
 }
