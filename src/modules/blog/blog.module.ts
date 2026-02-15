@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
 import { BlogBookmarksEntity } from './entities/bookmark.entity';
 import { BlogLikesEntity } from './entities/like.entity';
+import { BlogCommentEntiy } from './entities/comment.entity';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([BlogEntity,BlogBookmarksEntity,BlogLikesEntity])],
+  imports : [TypeOrmModule.forFeature([BlogEntity,BlogBookmarksEntity,BlogLikesEntity,BlogCommentEntiy])],
   controllers: [BlogController],
   providers: [BlogService],
 })

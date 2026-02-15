@@ -5,6 +5,7 @@ import { UserEntity } from "src/modules/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
 import { BlogLikesEntity } from "./like.entity";
 import { BlogBookmarksEntity } from "./bookmark.entity";
+import { BlogCommentEntiy } from "./comment.entity";
 
 @Entity(EntityNames.BLOG)
 export class BlogEntity extends BaseEntity {
@@ -27,6 +28,8 @@ export class BlogEntity extends BaseEntity {
     likes:BlogLikesEntity[]
     @OneToMany(()=>BlogBookmarksEntity,bookmarks=>bookmarks.blog)
     bookmarks:BlogBookmarksEntity[]
+    @OneToMany(()=>BlogCommentEntiy,comment=>comment.blog)
+    comments:BlogCommentEntiy[]
     @CreateDateColumn()
     created_at:Date
     @UpdateDateColumn()
