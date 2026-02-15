@@ -33,7 +33,13 @@ export class BlogService {
         return {
             message:BLOG_MESSAGE.CREATED
         }
-        
+    }
+    async getMyBlogs(){
+        const user = this.request.user
+        return this.blogRepo.find({
+            where:{author_id:user!.id},
+            order:{id:"DESC"}
+        })
     }
 
 }

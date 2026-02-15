@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dto/blog.dto';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -16,6 +16,12 @@ export class BlogController {
   @UseGuards(AuthGuard)
   create(@Body() blogDto:CreateBlogDto){
     return this.blogService.create(blogDto)
+  }
+  @Get("/My_Blogs")
+  @ApiBearerAuth("Authorization")
+  @UseGuards(AuthGuard)
+  getMyBlogs(){
+    return this.blogService.getMyBlogs()
   }
 
 }
