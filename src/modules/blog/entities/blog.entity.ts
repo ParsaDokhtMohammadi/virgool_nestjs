@@ -22,7 +22,7 @@ export class BlogEntity extends BaseEntity {
     @Column({unique:true})
     slug:string
     @Column()
-    read_time:string
+    read_time:number
     @Column()
     author_id:number
     @ManyToOne(()=>UserEntity , user=>user.blogs,{onDelete:"CASCADE"})

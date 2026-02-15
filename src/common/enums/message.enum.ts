@@ -66,3 +66,6 @@ export enum IMAGE_MESSAGES {
     INVALID_FORMAT = "invalid image format only jpg png jpeg amd webp allowed"
 }
 
+export enum BLOG_MESSAGE {
+    CREATED = "blog created"
+}

@@ -24,9 +24,9 @@ export class CreateBlogDto {
     content:string
     @ApiProperty()
     @IsNotEmpty()
-    @IsString()
-    read_time:string
-    @ApiPropertyOptional({format:"binary"})
+    @IsNumber()
+    read_time:number
+    @ApiPropertyOptional()
     @IsOptional({always:true})
     image:string
     
