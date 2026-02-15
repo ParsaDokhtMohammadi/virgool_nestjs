@@ -19,6 +19,10 @@ export class BlogEntity extends BaseEntity {
     status:string
     @Column({nullable:true})
     image:string
+    @Column({unique:true})
+    slug:string
+    @Column()
+    read_time:string
     @Column()
     author_id:number
     @ManyToOne(()=>UserEntity , user=>user.blogs,{onDelete:"CASCADE"})
