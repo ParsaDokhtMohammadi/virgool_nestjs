@@ -10,6 +10,7 @@ export class CreateBlogDto {
     @ApiPropertyOptional()
     @IsString()
     @Length(10,40)
+    @IsOptional()
     slug:string
     @ApiProperty()
     @IsNotEmpty()
@@ -25,8 +26,8 @@ export class CreateBlogDto {
     @IsNotEmpty()
     @IsString()
     read_time:string
-    @ApiProperty({format:"binary",nullable:true})
-    @IsOptional()
+    @ApiPropertyOptional({format:"binary"})
+    @IsOptional({always:true})
     image:string
     
 }

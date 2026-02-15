@@ -6,9 +6,10 @@ import { BlogEntity } from './entities/blog.entity';
 import { BlogBookmarksEntity } from './entities/bookmark.entity';
 import { BlogLikesEntity } from './entities/like.entity';
 import { BlogCommentEntiy } from './entities/comment.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([BlogEntity,BlogBookmarksEntity,BlogLikesEntity,BlogCommentEntiy])],
+  imports : [AuthModule,TypeOrmModule.forFeature([BlogEntity,BlogBookmarksEntity,BlogLikesEntity,BlogCommentEntiy])],
   controllers: [BlogController],
   providers: [BlogService],
 })
