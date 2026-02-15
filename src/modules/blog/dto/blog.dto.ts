@@ -31,3 +31,8 @@ export class CreateBlogDto {
     image:string
     
 }
+
+
+export class FilterBlogDto {
+    search : string
+}

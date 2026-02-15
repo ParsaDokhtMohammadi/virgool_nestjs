@@ -7,6 +7,8 @@ import { generateSlug, randomId } from 'src/common/utils/genSlug.utils';
 import type{ AuthRequest } from 'src/common/types/authRequest.type';
 import { REQUEST } from '@nestjs/core';
 import { BLOG_MESSAGE } from 'src/common/enums/message.enum';
+import { PaginationDto } from 'src/common/Dtos/pagination.dto';
+import { paginationGenerator, PaginationResolver } from 'src/common/utils/pagination.utils';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -41,5 +43,17 @@ export class BlogService {
             order:{id:"DESC"}
         })
     }
-
+    async blogList(Dto:PaginationDto){
+        const {limit,page,skip} = PaginationResolver(Dto)
+        const [blogs,count] = await this.blogRepo.findAndCount({
+            where:{},
+            order:{id:"DESC"},
+            skip,
+            take:limit
+        })
+        return {
+            pagination:paginationGenerator(count,page,limit),
+            blogs
+        }
+    }
 }
