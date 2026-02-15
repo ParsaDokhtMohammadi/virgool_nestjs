@@ -6,6 +6,7 @@ import { Json, MultipartData } from 'src/common/constants/constants';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { Pagination } from 'src/common/decorators/pagination.decorator';
 import { PaginationDto } from 'src/common/Dtos/pagination.dto';
+import { skipAuth } from 'src/common/decorators/skipAuth.decorator';
 
 @Controller('blog')
 @ApiTags("Blog")
@@ -25,6 +26,7 @@ export class BlogController {
   }
   @Get("/")
   @Pagination()
+  @skipAuth()
   blogList(@Query() Dto:PaginationDto){
     return this.blogService.blogList(Dto)
   }
