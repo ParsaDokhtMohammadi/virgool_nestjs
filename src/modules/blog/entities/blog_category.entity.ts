@@ -1,6 +1,6 @@
 import { BaseEntity } from "src/common/abstracts/base.entity";
 import { EntityNames } from "src/common/enums/entity.enum";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { BlogEntity } from "./blog.entity";
 import { CategoryEntity } from "src/modules/category/entities/category.entity";
 
@@ -11,7 +11,9 @@ export class BlogCategoryEntity extends BaseEntity {
     @Column()
     category_id:number
     @ManyToOne(()=>BlogEntity,blog=>blog.categories , {onDelete:"CASCADE"})
+    @JoinColumn({name:"blog_id"})
     blog:BlogEntity
     @ManyToOne(()=>CategoryEntity,category=>category.blog_category , {onDelete:"CASCADE"} )
+    @JoinColumn({name:"category_id"})
     category:CategoryEntity
 }

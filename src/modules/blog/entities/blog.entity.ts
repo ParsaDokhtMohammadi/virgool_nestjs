@@ -35,7 +35,7 @@ export class BlogEntity extends BaseEntity {
     bookmarks:BlogBookmarksEntity[]
     @OneToMany(()=>BlogCommentEntiy,comment=>comment.blog)
     comments:BlogCommentEntiy[]
-    @OneToMany(()=>BlogCommentEntiy,category=>category.blog)
+    @OneToMany(()=>BlogCategoryEntity,category=>category.blog)
     categories:BlogCategoryEntity[]
 
     @CreateDateColumn()

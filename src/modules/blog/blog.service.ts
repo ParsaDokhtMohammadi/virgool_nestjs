@@ -2,8 +2,8 @@ import { CategoryService } from './../category/category.service';
 import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
-import { Repository } from 'typeorm';
-import { CreateBlogDto } from './dto/blog.dto';
+import { FindOptionsWhere, Repository } from 'typeorm';
+import { CreateBlogDto, FilterBlogDto } from './dto/blog.dto';
 import { generateSlug, randomId } from 'src/common/utils/genSlug.utils';
 import type { AuthRequest } from 'src/common/types/authRequest.type';
 import { REQUEST } from '@nestjs/core';
@@ -42,7 +42,7 @@ export class BlogService {
             content,
             image,
             read_time,
-            author_id: user?.id
+            author_id: user?.id 
         })
         await this.blogRepo.save(blog)
         for (const categoryTitle of categories) {
@@ -66,10 +66,33 @@ export class BlogService {
             order: { id: "DESC" }
         })
     }
-    async blogList(Dto: PaginationDto) {
-        const { limit, page, skip } = PaginationResolver(Dto)
+    async blogList( paginationDto: PaginationDto,filterDto:FilterBlogDto) {
+        const { limit, page, skip } = PaginationResolver(paginationDto)
+        const {category} = filterDto
+        let where :FindOptionsWhere<BlogEntity> = {}
+        if(category){
+            where["categories"] = {
+                category:{
+                    title:category
+                }
+            }
+        }
         const [blogs, count] = await this.blogRepo.findAndCount({
-            where: {},
+            relations:{
+                categories:{
+                    category:true
+                }
+            },
+            where,
+            select:{
+                categories:{
+                    id:true,
+                    category:{
+                        id:true,
+                        title:true
+                    }
+                }
+            },
             order: { id: "DESC" },
             skip,
             take: limit
@@ -79,4 +102,4 @@ export class BlogService {
             blogs
         }
     }
-}
+}  
