@@ -25,6 +25,12 @@ export class CategoryService {
       message: "category created"
     }
   }
+  async insertByTitle(title:string) {
+    const category = this.categoryRepo.create({
+      title,  
+    })
+    return await this.categoryRepo.save(category)
+  }
   async checkExistsAndResolveTitle(title: string) {
     title = title?.trim()?.toLowerCase()
     const category = await this.categoryRepo.findOneBy({ title })
@@ -50,6 +56,9 @@ export class CategoryService {
     if (!category) throw new NotFoundException(CATEGORY_MESSAGES.NOT_FOUND)
     return  category
     
+  }
+  async findOneByTitle(title:string) {
+    return await this.categoryRepo.findOneBy({ title });
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {

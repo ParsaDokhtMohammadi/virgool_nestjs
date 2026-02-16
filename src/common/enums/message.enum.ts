@@ -67,5 +67,6 @@ export enum IMAGE_MESSAGES {
 }
 
 export enum BLOG_MESSAGE {
-    CREATED = "blog created"
+    CREATED = "blog created",
+    INVALID_DATA = "invalid blog data"
 }
