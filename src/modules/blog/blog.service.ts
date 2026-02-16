@@ -12,6 +12,7 @@ import { PaginationDto } from 'src/common/Dtos/pagination.dto';
 import { paginationGenerator, PaginationResolver } from 'src/common/utils/pagination.utils';
 import { isArray } from 'class-validator';
 import { BlogCategoryEntity } from './entities/blog_category.entity';
+import { EntityNames } from 'src/common/enums/entity.enum';
 
 
 @Injectable({ scope: Scope.REQUEST })
@@ -68,35 +69,48 @@ export class BlogService {
     }
     async blogList( paginationDto: PaginationDto,filterDto:FilterBlogDto) {
         const { limit, page, skip } = PaginationResolver(paginationDto)
-        const {category} = filterDto
-        let where :FindOptionsWhere<BlogEntity> = {}
+        let {category , search} = filterDto
+        let where = ''
         if(category){
-            where["categories"] = {
-                category:{
-                    title:category
-                }
-            }
+            category = category.toLocaleLowerCase()
+            if(where.length>0) where += " AND "
+            where +="category.title = LOWER(:category)"
         }
-        const [blogs, count] = await this.blogRepo.findAndCount({
-            relations:{
-                categories:{
-                    category:true
-                }
-            },
-            where,
-            select:{
-                categories:{
-                    id:true,
-                    category:{
-                        id:true,
-                        title:true
-                    }
-                }
-            },
-            order: { id: "DESC" },
-            skip,
-            take: limit
-        })
+        if(search){
+            search = `%${search}%`
+            where += "CONCAT(blog.title,blog.description,blog.content) ILIKE :search"
+        }
+        const [blogs, count] = await this.blogRepo.createQueryBuilder(EntityNames.BLOG)
+        .leftJoin("blog.categories","categories")
+        .leftJoin("categories.category","category")
+        .addSelect(['categories.id',"category.title"])
+        .where(where,{category,search})
+        .orderBy("blog.id","DESC")
+        .skip(skip)
+        .take(limit)
+        .getManyAndCount()
+
+        
+        // const [blogs, count] = await this.blogRepo.findAndCount({
+        //     relations:{
+        //         categories:{
+        //             category:true
+        //         }
+        //     },
+        //     where,
+        //     select:{
+        //         categories:{
+        //             id:true,
+        //             category:{
+        //                 id:true,
+        //                 title:true
+        //             }
+        //         }
+        //     },
+        //     order: { id: "DESC" },
+        //     skip,
+        //     take: limit
+        // })
         return {
             pagination: paginationGenerator(count, page, limit),
             blogs
