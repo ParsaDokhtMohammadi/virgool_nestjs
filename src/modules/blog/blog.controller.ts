@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { BlogService } from './blog.service';
-import { CreateBlogDto, FilterBlogDto } from './dto/blog.dto';
+import { CreateBlogDto, FilterBlogDto, UpdateBlogDto } from './dto/blog.dto';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Json, MultipartData } from 'src/common/constants/constants';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -20,6 +20,14 @@ export class BlogController {
   @ApiConsumes(Json,MultipartData)  
   create(@Body() blogDto:CreateBlogDto){
     return this.blogService.create(blogDto)
+  }
+  @Patch("/:id")
+  @ApiConsumes(Json,MultipartData)  
+  update(
+    @Body() blogDto:UpdateBlogDto,
+    @Param("id", ParseIntPipe) id:number
+  ){
+    return this.blogService.update(blogDto,id)
   }
   @Get("/My_Blogs")
   getMyBlogs(){

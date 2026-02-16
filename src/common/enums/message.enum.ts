@@ -71,5 +71,6 @@ export enum BLOG_MESSAGE {
     INVALID_DATA = "invalid blog data",
     NOT_FOUND = "blog not found",
     DELETED = "blog deleted",
-    CANT_DELETE = "cant delete blogs that are not your own"
+    CANT_DELETE = "cant delete blogs that are not your own",
+    UPDATED = "blog updated"
 }
