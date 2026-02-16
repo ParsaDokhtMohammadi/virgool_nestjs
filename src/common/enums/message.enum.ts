@@ -72,5 +72,7 @@ export enum BLOG_MESSAGE {
     NOT_FOUND = "blog not found",
     DELETED = "blog deleted",
     CANT_DELETE = "cant delete blogs that are not your own",
-    UPDATED = "blog updated"
+    UPDATED = "blog updated",
+    LIKED = "blog liked",
+    DISLIKE = "like removed"
 }

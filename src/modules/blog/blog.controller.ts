@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { CreateBlogDto, FilterBlogDto, UpdateBlogDto } from './dto/blog.dto';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -43,5 +43,9 @@ export class BlogController {
   @Delete("/:id")
   delete(@Param("id", ParseIntPipe) id:number){
     return this.blogService.delete(id)
+  }
+  @Get("/like/:id")
+  likeToggle(@Param("id", ParseIntPipe) id:number){
+    return this.blogService.likeToggle(id)
   }
 }

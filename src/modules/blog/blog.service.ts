@@ -13,6 +13,8 @@ import { paginationGenerator, PaginationResolver } from 'src/common/utils/pagina
 import { isArray } from 'class-validator';
 import { BlogCategoryEntity } from './entities/blog_category.entity';
 import { EntityNames } from 'src/common/enums/entity.enum';
+import { BlogLikesEntity } from './entities/like.entity';
+import e from 'express';
 
 
 @Injectable({ scope: Scope.REQUEST })
@@ -20,6 +22,7 @@ export class BlogService {
     constructor(
         @InjectRepository(BlogEntity) private blogRepo: Repository<BlogEntity>,
         @InjectRepository(BlogCategoryEntity) private blogCategoryRepo: Repository<BlogCategoryEntity>,
+        @InjectRepository(BlogLikesEntity) private BlogLikeRepo: Repository<BlogLikesEntity>,
         @Inject(REQUEST) private request: AuthRequest,
         private categoryService: CategoryService
     ) { }
@@ -154,7 +157,7 @@ export class BlogService {
     }
     async delete(id: number) {
         const blog = await this.checkBlogExists(id)
-        this.checkBlogExists(blog.author_id)
+        this.checkBlogIsForUser(blog.author_id)
         await this.blogRepo.delete({ id })
         return {
             message: BLOG_MESSAGE.DELETED
@@ -163,10 +166,24 @@ export class BlogService {
     async checkBlogExists(id: number) {
         const blog = await this.blogRepo.findOneBy({ id })
         if (!blog) throw new NotFoundException(BLOG_MESSAGE.NOT_FOUND)
-            return blog
+        return blog
     }
     checkBlogIsForUser(id:number){
         const user = this.request.user
         if (id !== user!.id) throw new UnauthorizedException(BLOG_MESSAGE.CANT_DELETE)     
+    }
+
+    async likeToggle(blog_id:number){
+        const user = this.request.user
+        await this.checkBlogExists(blog_id)
+        const isLiked = await this.BlogLikeRepo.findOneBy({blog_id,user_id:user!.id})
+        if(isLiked) {
+            await this.BlogLikeRepo.delete({id:isLiked.id})
+            return {message:BLOG_MESSAGE.DISLIKE}
+        }
+        await this.BlogLikeRepo.insert({
+            blog_id,user_id:user!.id
+        })
+        return {message:BLOG_MESSAGE.LIKED} 
     }
 }  
