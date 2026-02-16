@@ -1,5 +1,5 @@
 import { CategoryService } from './../category/category.service';
-import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
@@ -115,5 +115,19 @@ export class BlogService {
             pagination: paginationGenerator(count, page, limit),
             blogs
         }
+    }
+    async delete(id:number){
+        const user = this.request.user
+        const blog =await this.checkBlogExists(id)
+        if(blog.author_id!==user!.id)throw new UnauthorizedException(BLOG_MESSAGE.CANT_DELETE)
+        await this.blogRepo.delete({id})
+        return {
+            message:BLOG_MESSAGE.DELETED
+        }
+    }
+    async checkBlogExists(id:number){
+        const blog = await this.blogRepo.findOneBy({id})
+        if(!blog) throw new NotFoundException(BLOG_MESSAGE.NOT_FOUND)
+        return blog
     }
 }  

@@ -68,5 +68,8 @@ export enum IMAGE_MESSAGES {
 
 export enum BLOG_MESSAGE {
     CREATED = "blog created",
-    INVALID_DATA = "invalid blog data"
+    INVALID_DATA = "invalid blog data",
+    NOT_FOUND = "blog not found",
+    DELETED = "blog deleted",
+    CANT_DELETE = "cant delete blogs that are not your own"
 }
