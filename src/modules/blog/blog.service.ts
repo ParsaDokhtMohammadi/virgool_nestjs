@@ -122,8 +122,11 @@ export class BlogService {
         const [blogs, count] = await this.blogRepo.createQueryBuilder(EntityNames.BLOG)
             .leftJoin("blog.categories", "categories")
             .leftJoin("categories.category", "category")
-            .addSelect(['categories.id', "category.title"])
+            .leftJoin("blog.user","author")
+            .leftJoin("author.profile","profile")
+            .addSelect(['categories.id', "category.title","author.username","author.id","profile.nick_name"])
             .where(where, { category, search })
+            .loadRelationCountAndMap("blog.likes","blog.likes")
             .orderBy("blog.id", "DESC")
             .skip(skip)
             .take(limit)
@@ -186,4 +189,5 @@ export class BlogService {
         })
         return {message:BLOG_MESSAGE.LIKED} 
     }
+
 }  
