@@ -74,5 +74,7 @@ export enum BLOG_MESSAGE {
     CANT_DELETE = "cant delete blogs that are not your own",
     UPDATED = "blog updated",
     LIKED = "blog liked",
-    DISLIKE = "like removed"
+    DISLIKE = "like removed",
+    BOOKMARKED = "blog bookmarked",
+    BOOKMARK_REMOVED = "bookmark removed"
 }
