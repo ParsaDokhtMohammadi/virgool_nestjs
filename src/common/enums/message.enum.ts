@@ -78,3 +78,10 @@ export enum BLOG_MESSAGE {
     BOOKMARKED = "blog bookmarked",
     BOOKMARK_REMOVED = "bookmark removed"
 }
+
+//comments 
+
+export enum COMMENT_MESSAGES {
+    NOTFOUND = "comment not found",
+    SUCCESS = "comment added to blog"
+}

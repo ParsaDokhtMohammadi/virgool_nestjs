@@ -1,9 +1,9 @@
-import { CategoryService } from './../category/category.service';
+import { CategoryService } from '../../category/category.service';
 import { BadRequestException, Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BlogEntity } from './entities/blog.entity';
+import { BlogEntity } from '../entities/blog.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { CreateBlogDto, FilterBlogDto, UpdateBlogDto } from './dto/blog.dto';
+import { CreateBlogDto, FilterBlogDto, UpdateBlogDto } from '../dto/blog.dto';
 import { generateSlug, randomId } from 'src/common/utils/genSlug.utils';
 import type { AuthRequest } from 'src/common/types/authRequest.type';
 import { REQUEST } from '@nestjs/core';
@@ -11,11 +11,12 @@ import { BLOG_MESSAGE } from 'src/common/enums/message.enum';
 import { PaginationDto } from 'src/common/Dtos/pagination.dto';
 import { paginationGenerator, PaginationResolver } from 'src/common/utils/pagination.utils';
 import { isArray } from 'class-validator';
-import { BlogCategoryEntity } from './entities/blog_category.entity';
+import { BlogCategoryEntity } from '../entities/blog_category.entity';
 import { EntityNames } from 'src/common/enums/entity.enum';
-import { BlogLikesEntity } from './entities/like.entity';
+import { BlogLikesEntity } from '../entities/like.entity';
 import e from 'express';
-import { BlogBookmarksEntity } from './entities/bookmark.entity';
+import { BlogBookmarksEntity } from '../entities/bookmark.entity';
+import { CreateCommentDto } from '../dto/comment.dto';
 
 
 @Injectable({ scope: Scope.REQUEST })
@@ -205,5 +206,6 @@ export class BlogService {
         })
         return {message:BLOG_MESSAGE.BOOKMARKED} 
     }
+
 
 }  
