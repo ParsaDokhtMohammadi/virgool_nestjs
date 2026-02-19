@@ -1,7 +1,7 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogEntity } from '../entities/blog.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import type { AuthRequest } from 'src/common/types/authRequest.type';
 import { REQUEST } from '@nestjs/core';
 
@@ -19,7 +19,7 @@ export class BlogCommentService {
         @InjectRepository(BlogCommentEntiy) private blogCommentRepo: Repository<BlogCommentEntiy>,
         @InjectRepository(BlogEntity) private blogRepo: Repository<BlogEntity>,
         @Inject(REQUEST) private request: AuthRequest,
-        private blogService: BlogService
+        @Inject(forwardRef(() => BlogService)) private blogService: BlogService
 
     ) { }
     async create(Dto: CreateCommentDto) {
@@ -58,6 +58,65 @@ export class BlogCommentService {
                     username: true,
                     profile: {
                         nick_name: true
+                    }
+                }
+            },
+            skip,
+            take: limit,
+            order: { id: "DESC" }
+        })
+
+        return {
+            pagination: paginationGenerator(count, page, limit),
+            comments
+        }
+    }
+    async findCommentsOfBlog(blog_id: number, paginationDto: PaginationDto) {
+        const { limit, page, skip } = PaginationResolver(paginationDto)
+        const [comments, count] = await this.blogCommentRepo.findAndCount({
+            where: { blog_id, parent_id: IsNull() },
+            relations: {
+                blog: true,
+                user: { profile: true },
+                children: {
+
+                    blog: true,
+                    user: { profile: true },
+                    children: {
+                        blog: true,
+                        user: { profile: true },
+                    }
+
+                }
+            },
+            select: {
+                blog: {
+                    title: true
+                },
+                user: {
+                    username: true,
+                    profile: {
+                        nick_name: true
+                    }
+                }, children: {
+                    text: true,
+                    created_at: true,
+                    parent_id: true,
+                    user: {
+                        username: true,
+                        profile: {
+                            nick_name: true
+                        }
+                    }, children: {
+                        text: true,
+                        created_at: true,
+                        parent_id: true,
+                        user: {
+                            username: true,
+                            profile: {
+                                nick_name: true
+                            }
+                        }
                     }
                 }
             },

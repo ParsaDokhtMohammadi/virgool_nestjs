@@ -41,8 +41,9 @@ export class BlogController {
     return this.blogService.blogList(paginationDto,filterBlogDto)
   }
   @Get("/by-slug/:slug")
-  findOneBySlug(@Param() slug:string){
-    return this.blogService.findOneBySlug(slug)
+  @Pagination()
+  findOneBySlug(@Param() slug:string , @Query() paginationDto:PaginationDto){
+    return this.blogService.findOneBySlug(slug,paginationDto)
   }
   @Delete("/:id")
   delete(@Param("id", ParseIntPipe) id:number){
