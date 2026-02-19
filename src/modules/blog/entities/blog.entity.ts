@@ -37,7 +37,6 @@ export class BlogEntity extends BaseEntity {
     comments:BlogCommentEntiy[]
     @OneToMany(()=>BlogCategoryEntity,category=>category.blog)
     categories:BlogCategoryEntity[]
-
     @CreateDateColumn()
     created_at:Date
     @UpdateDateColumn()

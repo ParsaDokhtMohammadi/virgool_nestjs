@@ -40,6 +40,10 @@ export class BlogController {
   blogList(@Query() paginationDto:PaginationDto , @Query() filterBlogDto:FilterBlogDto){
     return this.blogService.blogList(paginationDto,filterBlogDto)
   }
+  @Get("/by-slug/:slug")
+  findOneBySlug(@Param() slug:string){
+    return this.blogService.findOneBySlug(slug)
+  }
   @Delete("/:id")
   delete(@Param("id", ParseIntPipe) id:number){
     return this.blogService.delete(id)
