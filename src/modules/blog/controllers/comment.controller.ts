@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Json, MultipartData, urlEncoded } from 'src/common/constants/constants';
 import { AuthGuard } from '../../auth/guards/auth.guard';
@@ -24,6 +24,14 @@ export class BlogCommentController {
   @Pagination()
   blogList(@Query() paginationDto: PaginationDto) {
     return this.blogCommentService.find(paginationDto)
+  }
+  @Put("/accept/:id")
+  acceptComment(@Param("id",ParseIntPipe) id:number) {
+    return this.blogCommentService.accept(id)
+  }
+  @Put("/reject/:id")
+  rejectComment(@Param("id",ParseIntPipe) id:number) {
+    return this.blogCommentService.reject(id)
   }
 
 }

@@ -83,5 +83,9 @@ export enum BLOG_MESSAGE {
 
 export enum COMMENT_MESSAGES {
     NOTFOUND = "comment not found",
-    SUCCESS = "comment added to blog"
+    SUCCESS = "comment added to blog",
+    ALREADY_ACCEPTED = "comment already accepted",
+    ALREADY_REJECTED = "comment already rejected",
+    ACCEPTED = "comment accepted",
+    REJECT = "comment rejected"
 }
