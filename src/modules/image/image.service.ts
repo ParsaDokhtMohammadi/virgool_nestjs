@@ -17,7 +17,7 @@ export class ImageService {
   findAll() {
     return `This action returns all image`;
   }
-
+ 
   findOne(id: number) {
     return `This action returns a #${id} image`;
   }
