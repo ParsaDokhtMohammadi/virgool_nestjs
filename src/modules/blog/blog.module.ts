@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { BlogService } from './services/blog.service';
 import { BlogController } from './controllers/blog.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,10 +12,15 @@ import { CategoryEntity } from '../category/entities/category.entity';
 import { BlogCategoryEntity } from './entities/blog_category.entity';
 import { BlogCommentService } from './services/comment.service';
 import { BlogCommentController } from './controllers/comment.controller';
+import { AddUserToReqWOV } from 'src/common/middleware/addUserToReqWOV.middleware';
 
 @Module({
   imports : [AuthModule,TypeOrmModule.forFeature([BlogEntity,BlogBookmarksEntity,BlogLikesEntity,BlogCommentEntiy,BlogCategoryEntity,CategoryEntity])],
   controllers: [BlogController,BlogCommentController],
   providers: [BlogService , CategoryService , BlogCommentService],
 })
-export class BlogModule {}
+export class BlogModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AddUserToReqWOV).forRoutes("blog/by-slug/:slug")
+  }
+}

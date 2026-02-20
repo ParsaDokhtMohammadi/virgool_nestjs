@@ -41,6 +41,7 @@ export class BlogController {
     return this.blogService.blogList(paginationDto,filterBlogDto)
   }
   @Get("/by-slug/:slug")
+  @skipAuth()
   @Pagination()
   findOneBySlug(@Param() slug:string , @Query() paginationDto:PaginationDto){
     return this.blogService.findOneBySlug(slug,paginationDto)
