@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ImageService } from './image.service';
 import { ImageDto } from './dto/create-image.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthDecorator } from 'src/common/decorators/auth.decorator';
+import { UploadFile } from 'src/common/interceptor/upload.interceptor';
+import type{ MulterFile } from 'src/common/utils/multer.utils';
+import { MultipartData } from 'src/common/constants/constants';
 
 
 @Controller('image')
@@ -12,9 +15,10 @@ export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
   @Post()
-  @UseInterceptors()
-  create(@Body() ImageDto: ImageDto) {
-    return this.imageService.create(ImageDto);
+  @UseInterceptors(UploadFile("image"))
+  @ApiConsumes(MultipartData)
+  create(@Body() ImageDto: ImageDto , @UploadedFile() image:MulterFile) {
+    return this.imageService.create(ImageDto,image);
   }
 
   @Get()
