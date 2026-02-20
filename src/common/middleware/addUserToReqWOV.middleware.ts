@@ -1,8 +1,7 @@
-import { Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
-import { NextFunction, Request, Response } from "express";
+import { Injectable, NestMiddleware } from "@nestjs/common";
+import { NextFunction,Response } from "express";
 import { AuthRequest } from "../types/authRequest.type";
 import { AuthService } from "src/modules/auth/auth.service";
-import { AuthMessage } from "../enums/message.enum";
 import { isJWT } from "class-validator";
 ;
 
