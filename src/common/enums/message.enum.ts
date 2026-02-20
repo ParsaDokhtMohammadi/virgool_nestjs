@@ -63,7 +63,10 @@ export enum PROFILE_MESSAGES {
 }
 //images
 export enum IMAGE_MESSAGES {
-    INVALID_FORMAT = "invalid image format only jpg png jpeg amd webp allowed"
+    INVALID_FORMAT = "invalid image format only jpg png jpeg amd webp allowed",
+    ADDED = "imaged added",
+    NOTFOUND = "image not found",
+    DELETED = "image deleted"
 }
 
 export enum BLOG_MESSAGE {
