@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, ParseFilePipe, UseGuards, UploadedFiles, Res, Patch, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, ParseFilePipe, UseGuards, UploadedFiles, Res, Patch, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ProfileDto } from './dto/profile.dto';
@@ -9,6 +9,8 @@ import type{ ProfileImages } from './types/files.type';
 import { changeEmailDto, changeUsernameDto } from './dto/changeCredentials.dto';
 import type{ Response } from 'express';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
+import { Pagination } from 'src/common/decorators/pagination.decorator';
+import { PaginationDto } from 'src/common/Dtos/pagination.dto';
 
 @Controller('user')
 @ApiTags("user")
@@ -33,9 +35,21 @@ export class UserController {
     return this.userService.getProfile()
   }
   @Get("/list")
+  @Pagination()
   getUsers(){
     return this.userService.find()
   }
+  @Get("/followers")
+  @Pagination()
+  getFollowers(@Query() paginationDto : PaginationDto){
+    return this.userService.getFollowers(paginationDto)
+  }
+  @Get("/followings")
+  @Pagination()
+  getFollowings(@Query() paginationDto : PaginationDto){
+    return this.userService.getFollowings(paginationDto)
+  }
+
   @Patch("/change-email")
   @ApiConsumes(urlEncoded,Json)
   async changeEmail(@Body() dto:changeEmailDto , @Res({ passthrough: true }) res: Response){

@@ -16,6 +16,8 @@ import { TOKEN_TYPE } from 'src/common/enums/type.enum';
 import { changeEmailDto, changeUsernameDto } from './dto/changeCredentials.dto';
 import { FollowEntity } from './entities/follow.entity';
 import { EntityNames } from 'src/common/enums/entity.enum';
+import { PaginationDto } from 'src/common/Dtos/pagination.dto';
+import { PaginationResolver } from 'src/common/utils/pagination.utils';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -141,6 +143,68 @@ export class UserService {
  }
  async find(){
   return await this.userRepo.find()
+ }
+ async getFollowers(paginationDto:PaginationDto){
+  const {limit , page , skip} = PaginationResolver(paginationDto)
+  const user = this.request.user
+  const [followers,count] = await this.FollowRepo.findAndCount({
+    where : {following_id:user!.id},
+    relations:{
+      followers :{
+        profile:true
+      }
+    },
+    select:{
+      id:true,
+      followers:{
+        id:true,
+        username:true,
+        profile:{
+          id:true,
+          nick_name:true,
+          bio:true,
+          image_bg:true,
+          image_profile:true
+        }
+      }
+    },
+    skip,
+    take:limit
+  })
+    return {
+    followers
+  }
+}
+async getFollowings(paginationDto:PaginationDto){
+   const {limit , page , skip} = PaginationResolver(paginationDto)
+     const user = this.request.user
+  const [followings,count] = await this.FollowRepo.findAndCount({
+    where : {follower_id:user!.id},
+    relations:{
+      following :{
+        profile:true
+      }
+    },
+    select:{
+      id:true,
+      following:{
+        id:true,
+        username:true,
+        profile:{
+          id:true,
+          nick_name:true,
+          bio:true,
+          image_bg:true,
+          image_profile:true
+        }
+      }
+    },
+    skip,
+    take:limit
+  })
+  return {
+    followings
+  }
  }
  
 }
