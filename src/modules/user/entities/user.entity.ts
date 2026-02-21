@@ -8,6 +8,7 @@ import { BlogLikesEntity } from 'src/modules/blog/entities/like.entity';
 import { BlogBookmarksEntity } from 'src/modules/blog/entities/bookmark.entity';
 import { BlogCommentEntiy } from 'src/modules/blog/entities/comment.entity';
 import { ImageEntity } from 'src/modules/image/entities/image.entity';
+import { ROLES } from 'src/common/enums/role.enum';
 
 @Entity(EntityNames.USER)
 export class UserEntity extends BaseEntity {
@@ -23,6 +24,8 @@ export class UserEntity extends BaseEntity {
     password:string
     @Column({default:false})
     verified!:boolean
+    @Column({default:ROLES.USER})
+    role:string
     @CreateDateColumn({default:new Date()})
     created_at!:Date
     @UpdateDateColumn({default:new Date()})

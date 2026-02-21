@@ -8,6 +8,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 import {AUTH_RESULTS_ENUM} from 'src/common/enums/type.enum';
 import { ResetPasswordGuard } from './guards/resetPass.guard';
+import { CanAccess } from 'src/common/decorators/role.decorator';
+import { ROLES } from 'src/common/enums/role.enum';
 
 
 @Controller('auth')
@@ -51,6 +53,7 @@ export class AuthController {
   @Get('check-login')
   @ApiBearerAuth("Authorization")
   @UseGuards(AuthGuard)
+  @CanAccess(ROLES.ADMIN,ROLES.USER)
   checkLogin(@Req() req:Request){
     return req.user
   }
