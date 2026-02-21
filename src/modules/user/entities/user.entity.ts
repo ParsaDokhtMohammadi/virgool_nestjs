@@ -46,7 +46,7 @@ export class UserEntity extends BaseEntity {
     @OneToMany(()=>ImageEntity,image=>image.user)
     images:ImageEntity[]
     @OneToMany(()=>FollowEntity,follow=>follow.following)
-    followings:FollowEntity[]
-    @OneToMany(()=>FollowEntity,follow=>follow.follower)
     followers:FollowEntity[]
+    @OneToMany(()=>FollowEntity,follow=>follow.followers)
+    followings:FollowEntity[]
 }

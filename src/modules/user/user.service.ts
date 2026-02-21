@@ -15,6 +15,7 @@ import { ProfileImages } from './types/files.type';
 import { TOKEN_TYPE } from 'src/common/enums/type.enum';
 import { changeEmailDto, changeUsernameDto } from './dto/changeCredentials.dto';
 import { FollowEntity } from './entities/follow.entity';
+import { EntityNames } from 'src/common/enums/entity.enum';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -78,10 +79,13 @@ export class UserService {
   const user = this.request.user
   if (!user) throw new UnauthorizedException(PROFILE_MESSAGES.NOT_LOGGEDIN);
   const {id} = user
-  return this.userRepo.findOne({
-    where:{id},
-    relations:['profile']
-  })
+  return this.userRepo.createQueryBuilder(EntityNames.USER)
+  .where({id})
+  .leftJoinAndSelect("user.profile","profile")
+  .loadRelationCountAndMap("user.followers","user.followers")
+  .loadRelationCountAndMap("user.following","user.following")
+  .getOne()
+  
  }
  async changeEmail({email}:changeEmailDto){
     const LogedIn = this.request.user;
