@@ -92,3 +92,8 @@ export enum COMMENT_MESSAGES {
     ACCEPTED = "comment accepted",
     REJECT = "comment rejected"
 }
+
+export enum FOLLOW_MESSAGES {
+    FOLLOW = "user followed",
+    UNFOLLOW = "user unfollowed"
+}

@@ -1,6 +1,6 @@
 import { MailService } from './../auth/mail.service';
 import { AuthService } from './../auth/auth.service';
-import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from '@nestjs/common';
 import { ProfileDto } from './dto/profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -8,12 +8,13 @@ import { Repository } from 'typeorm';
 import { ProfileEntity } from './entities/profile.entity';
 import { REQUEST } from '@nestjs/core';
 import type{ AuthRequest } from 'src/common/types/authRequest.type';
-import { PROFILE_MESSAGES } from 'src/common/enums/message.enum';
+import { FOLLOW_MESSAGES, PROFILE_MESSAGES } from 'src/common/enums/message.enum';
 import { isDate, isEmail } from 'class-validator';
 import { GENDER_ENUM } from 'src/common/enums/gender.enum';
 import { ProfileImages } from './types/files.type';
 import { TOKEN_TYPE } from 'src/common/enums/type.enum';
 import { changeEmailDto, changeUsernameDto } from './dto/changeCredentials.dto';
+import { FollowEntity } from './entities/follow.entity';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -21,6 +22,7 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity) private userRepo:Repository<UserEntity>,
     @InjectRepository(ProfileEntity) private ProfileRepo:Repository<ProfileEntity>,
+    @InjectRepository(FollowEntity) private FollowRepo:Repository<FollowEntity>,
     @Inject(REQUEST) private request:AuthRequest,
     private authService:AuthService,
     private mailService:MailService
@@ -113,4 +115,25 @@ export class UserService {
       message:PROFILE_MESSAGES.USERNAME_SUCCESS,
     } 
  }
+ async followToggle(following_id:number){
+  const user = this.request.user
+  const following = await this.userRepo.findOneBy({id:following_id})
+  if(!following) throw new NotFoundException(PROFILE_MESSAGES.NOTFOUND)
+  const isFollowing = await this.FollowRepo.findOneBy({following_id,follower_id:user!.id})
+  let message:string
+  if(isFollowing){
+    await this.FollowRepo.remove(isFollowing)
+    message=FOLLOW_MESSAGES.UNFOLLOW
+  }else{
+    await this.FollowRepo.insert({
+      following_id,
+      follower_id:user!.id
+    })
+    message=FOLLOW_MESSAGES.FOLLOW
+  }
+  return {
+    message
+  }
+ }
+ 
 }
