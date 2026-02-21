@@ -135,5 +135,8 @@ export class UserService {
     message
   }
  }
+ async find(){
+  return await this.userRepo.find()
+ }
  
 }

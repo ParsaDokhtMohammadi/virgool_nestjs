@@ -32,6 +32,10 @@ export class UserController {
   getProfile(){
     return this.userService.getProfile()
   }
+  @Get("/list")
+  getUsers(){
+    return this.userService.find()
+  }
   @Patch("/change-email")
   @ApiConsumes(urlEncoded,Json)
   async changeEmail(@Body() dto:changeEmailDto , @Res({ passthrough: true }) res: Response){
