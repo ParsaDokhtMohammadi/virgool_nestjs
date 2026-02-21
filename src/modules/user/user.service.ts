@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { ProfileEntity } from './entities/profile.entity';
 import { REQUEST } from '@nestjs/core';
 import type{ AuthRequest } from 'src/common/types/authRequest.type';
-import { FOLLOW_MESSAGES, PROFILE_MESSAGES } from 'src/common/enums/message.enum';
+import { BLOCK_MESSAGES, FOLLOW_MESSAGES, PROFILE_MESSAGES } from 'src/common/enums/message.enum';
 import { isDate, isEmail } from 'class-validator';
 import { GENDER_ENUM } from 'src/common/enums/gender.enum';
 import { ProfileImages } from './types/files.type';
@@ -18,6 +18,8 @@ import { FollowEntity } from './entities/follow.entity';
 import { EntityNames } from 'src/common/enums/entity.enum';
 import { PaginationDto } from 'src/common/Dtos/pagination.dto';
 import { PaginationResolver } from 'src/common/utils/pagination.utils';
+import { BlockDto } from './dto/block.dto';
+import { USER_STATUS } from 'src/common/enums/userStatus.enum';
 
 
 @Injectable({scope:Scope.REQUEST})
@@ -206,5 +208,24 @@ async getFollowings(paginationDto:PaginationDto){
     followings
   }
  }
- 
+ async blockToggle(Dto:BlockDto){
+    const {user_id} = Dto
+    const user = await this.userRepo.findOneBy({id:user_id})
+    if(!user) throw new NotFoundException(PROFILE_MESSAGES.NOTFOUND)
+    let message:BLOCK_MESSAGES
+    if(user.status === USER_STATUS.BLOCKED){
+      await this.userRepo.update({id:user_id},{
+        status:null
+      })
+      message = BLOCK_MESSAGES.UNBLOCKED
+    }else{
+            await this.userRepo.update({id:user_id},{
+        status:USER_STATUS.BLOCKED
+      })
+      message = BLOCK_MESSAGES.BLOCKED
+    }
+    return {
+      message
+    }
+ }
 }

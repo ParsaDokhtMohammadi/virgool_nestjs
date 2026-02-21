@@ -11,6 +11,9 @@ import type{ Response } from 'express';
 import { COOKIE_KEYS } from 'src/common/enums/cookie.enum';
 import { Pagination } from 'src/common/decorators/pagination.decorator';
 import { PaginationDto } from 'src/common/Dtos/pagination.dto';
+import { BlockDto } from './dto/block.dto';
+import { CanAccess } from 'src/common/decorators/role.decorator';
+import { ROLES } from 'src/common/enums/role.enum';
 
 @Controller('user')
 @ApiTags("user")
@@ -65,8 +68,15 @@ export class UserController {
   changeUsername(@Body() dto:changeUsernameDto , @Res({ passthrough: true }) res: Response){
     return this.userService.changeUsername(dto)
   }
+  @Post("/block")
+  @ApiConsumes(urlEncoded,Json)
+  block(@Body() blockDto : BlockDto){
+    return this.userService.blockToggle(blockDto)
+  }
+
   @Get("/follow/:following_id")
   @ApiParam({name:"following_id"})
+  @CanAccess(ROLES.ADMIN)
   follow(@Param("following_id",ParseIntPipe) following_id:number){
     return this.userService.followToggle(following_id)
   }

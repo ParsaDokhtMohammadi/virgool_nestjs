@@ -97,3 +97,8 @@ export enum FOLLOW_MESSAGES {
     FOLLOW = "user followed",
     UNFOLLOW = "user unfollowed"
 }
+
+export enum BLOCK_MESSAGES {
+    BLOCKED = "user blocked",
+    UNBLOCKED = "user unblocked"
+}
