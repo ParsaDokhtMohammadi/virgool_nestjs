@@ -21,7 +21,7 @@ let dataSource = new DataSource({
         "dist/**/**/*.entity{.ts,.js}"
     ],
     migrations : [
-        "dist/src/migrations/*{.ts,.js}"
+        "dist/migrations/*{.ts,.js}"
     ],
     migrationsTableName : "virgool_migration_db"
 })
