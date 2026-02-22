@@ -10,6 +10,6 @@ export const TypeOrmConfig = ():TypeOrmModuleOptions => {
         password:DB_PASSWORD,
         database:DB_NAME,
         autoLoadEntities:true,
-        synchronize:true
+        synchronize:false
     }
 } 

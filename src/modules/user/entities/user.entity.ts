@@ -23,8 +23,8 @@ export class UserEntity extends BaseEntity {
     pending_email:string|null
     @Column()
     password:string
-    @Column({nullable:true})
-    status:string|null
+    @Column({ type: "varchar",nullable:true})
+    status!:string|null
     @Column({default:false})
     verified!:boolean
     @Column({default:ROLES.USER})
