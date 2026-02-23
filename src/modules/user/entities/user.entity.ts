@@ -29,6 +29,8 @@ export class UserEntity extends BaseEntity {
     verified!:boolean
     @Column({default:ROLES.USER})
     role:string
+    @Column({default:0 , type:"numeric"})
+    balance:number
     @CreateDateColumn({default:new Date()})
     created_at!:Date
     @UpdateDateColumn({default:new Date()})

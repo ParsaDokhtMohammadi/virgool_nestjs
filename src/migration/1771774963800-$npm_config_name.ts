@@ -19,12 +19,16 @@ export class  $npmConfigName1771774963800 implements MigrationInterface {
                     {name:"password",type:"varchar(20)",isNullable:false},
                     {name:"created_at",type:"timestamp",default:"now()"}
                 ]
-            })
+            }),true
         )
+        const balance = await queryRunner.hasColumn(EntityNames.USER,"balance")
+        //@ts-ignore
+        if(!balance) await queryRunner.addColumn(EntityNames.USER,{name:"balance",type:"numeric",default:0})
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
        await queryRunner.dropTable(EntityNames.USER ,true)
+       await queryRunner.dropColumn(EntityNames.USER,"balance")
     }
 
 }
