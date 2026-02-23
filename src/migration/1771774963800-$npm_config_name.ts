@@ -1,7 +1,7 @@
 import { EntityNames } from "src/common/enums/entity.enum";
 import { ROLES } from "src/common/enums/role.enum";
 import { USER_STATUS } from "src/common/enums/userStatus.enum";
-import { MigrationInterface, QueryRunner, Table } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableColumn } from "typeorm";
 
 export class  $npmConfigName1771774963800 implements MigrationInterface {
 
@@ -11,7 +11,7 @@ export class  $npmConfigName1771774963800 implements MigrationInterface {
                 name:EntityNames.USER,
                 columns:[
                     {name:"id",isPrimary:true,type:"serial",isNullable:false},
-                    {name:"username",type:"varchar(50)",isNullable:false,isUnique:true},
+                    {name:"username",type:"varchar(50)",isNullable:true,isUnique:true},
                     {name:"email",type:"varchar(100)",isNullable:false,isUnique:true},
                     {name:"new_email",type:"varchar(100)",isNullable:true,isUnique:true},
                     {name:"role",type:"enum",enum:[ROLES.ADMIN,ROLES.USER]},
@@ -24,11 +24,20 @@ export class  $npmConfigName1771774963800 implements MigrationInterface {
         const balance = await queryRunner.hasColumn(EntityNames.USER,"balance")
         //@ts-ignore
         if(!balance) await queryRunner.addColumn(EntityNames.USER,{name:"balance",type:"numeric",default:0})
+        const username = await queryRunner.hasColumn(EntityNames.USER,"username")
+        //if i want to run this i need to comment the queries above
+        if(username) await queryRunner.changeColumn(EntityNames.USER,"username",new TableColumn({
+            name:"username",
+            isNullable:false,
+            isUnique:true,
+            type:"varchar(50)"
+        }))
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
        await queryRunner.dropTable(EntityNames.USER ,true)
        await queryRunner.dropColumn(EntityNames.USER,"balance")
+    
     }
 
 }
